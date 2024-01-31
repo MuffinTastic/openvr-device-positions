@@ -23,21 +23,24 @@ public static class Log
         [CallerLineNumber] int lineNumber = 0,
         [CallerMemberName] string? caller = null)
     {
-        string shortTimestamp = DateTime.Now.ToString( "hh:mm:ss" );
-        string longTimestamp = DateTime.Now.ToString( "yyyy/MM/dd hh:mm:ss" );
-
-        string shortMessage = $"[{shortTimestamp}] {text}";
-        string longMessage = $"[{Path.GetFileName( filePath )}:{lineNumber}] [{caller}] [{longTimestamp}] {text}";
-
-        foreach ( (bool verbose, Action<string> action) in LogSinks )
+        lock ( LogSinks )
         {
-            if ( verbose )
+            string shortTimestamp = DateTime.Now.ToString( "hh:mm:ss" );
+            string longTimestamp = DateTime.Now.ToString( "yyyy/MM/dd hh:mm:ss" );
+
+            string shortMessage = $"[{shortTimestamp}] {text}";
+            string longMessage = $"[{Path.GetFileName( filePath )}:{lineNumber}] [{caller}] [{longTimestamp}] {text}";
+
+            foreach ( (bool verbose, Action<string> action) in LogSinks )
             {
-                action( longMessage );
-            }
-            else
-            {
-                action( shortMessage );
+                if ( verbose )
+                {
+                    action( longMessage );
+                }
+                else
+                {
+                    action( shortMessage );
+                }
             }
         }
     }
