@@ -6,6 +6,8 @@
 *.user
 *.sln.docstates
 
+SteamVR Device Positions/External/openvr_api.cs
+
 # Build results
 
 [Dd]ebug/
