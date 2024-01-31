@@ -1,4 +1,4 @@
-namespace SteamVR_Tracker_Positions;
+namespace SteamVR_Device_Positions;
 
 public partial class Window : Form
 {

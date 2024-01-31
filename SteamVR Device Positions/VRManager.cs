@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using Valve.VR;
 
-namespace SteamVR_Tracker_Positions;
+namespace SteamVR_Device_Positions;
 
 public class VRManager
 {
