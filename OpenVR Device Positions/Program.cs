@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace OVRDP;
 
 internal static class Program
@@ -8,6 +10,8 @@ internal static class Program
     [STAThread]
     static void Main()
     {
+        Log.RegisterSink( verbose: true, ( text ) => Debug.Write( $"{text}\n" ) );
+
         var vrManager = VRManager.Init();
         if ( vrManager is null )
         {
