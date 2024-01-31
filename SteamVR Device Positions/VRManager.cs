@@ -37,14 +37,34 @@ public class VRManager
         OpenVR.Shutdown();
     }
 
-    internal void GetPositions( bool centerOnHMD )
+    internal void SavePositions( SaveSettings saveSettings )
     {
+        HashSet<ETrackedDeviceClass> desiredClasses = GetDesiredClasses( saveSettings );
+
+        Debug.Write( $"\nSaving devices: \n" );
+
         for ( uint i = 0; i < OpenVR.k_unMaxTrackedDeviceCount; i++ )
         {
             var deviceClass = _cVRSystem.GetTrackedDeviceClass( i );
-            if ( deviceClass == ETrackedDeviceClass.Invalid ) continue;
+            if ( !desiredClasses.Contains( deviceClass ) ) continue;
 
             Debug.Write( $"{deviceClass}\n" );
         }
+    }
+
+    private HashSet<ETrackedDeviceClass> GetDesiredClasses( SaveSettings saveSettings )
+    {
+        HashSet<ETrackedDeviceClass> desiredClasses = new();
+
+        if ( saveSettings.SaveBaseStations )
+            desiredClasses.Add( ETrackedDeviceClass.TrackingReference );
+        if ( saveSettings.SaveHMD )
+            desiredClasses.Add( ETrackedDeviceClass.HMD );
+        if ( saveSettings.SaveControllers )
+            desiredClasses.Add( ETrackedDeviceClass.Controller );
+        if ( saveSettings.SaveTrackers )
+            desiredClasses.Add( ETrackedDeviceClass.GenericTracker );
+
+        return desiredClasses;
     }
 }

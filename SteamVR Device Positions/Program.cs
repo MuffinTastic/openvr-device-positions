@@ -1,5 +1,3 @@
-using Valve.VR;
-
 namespace SteamVR_Device_Positions;
 
 internal static class Program
