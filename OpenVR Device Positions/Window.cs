@@ -4,14 +4,10 @@ namespace OVRDP;
 
 public partial class Window : Form
 {
-    private VRManager _vrManager;
-
     private const int c_MaxLogItems = 100;
 
-    public Window( VRManager vrManager )
+    public Window()
     {
-        _vrManager = vrManager;
-
         InitializeComponent();
 
         logBox.DrawMode = DrawMode.OwnerDrawVariable;
@@ -32,7 +28,7 @@ public partial class Window : Form
         }
     }
 
-    // Log ListBox word wrapping adapted from Kosmoï¿½ï¿½'s implementation
+    // Log ListBox word wrapping adapted from Kosmo—ë's implementation
     // https://stackoverflow.com/questions/17613613/winforms-dotnet-listbox-items-to-word-wrap-if-content-string-width-is-bigger-tha
 
     private void logBox_MeasureItem( object? sender, MeasureItemEventArgs e )

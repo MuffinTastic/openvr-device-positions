@@ -28,13 +28,48 @@ partial class Window
     /// </summary>
     private void InitializeComponent()
     {
+        logBox = new ListBox();
+        button1 = new Button();
+        button2 = new Button();
         SuspendLayout();
+        // 
+        // logBox
+        // 
+        logBox.Enabled = false;
+        logBox.ForeColor = SystemColors.WindowFrame;
+        logBox.FormattingEnabled = true;
+        logBox.ItemHeight = 15;
+        logBox.Location = new Point( 12, 12 );
+        logBox.Name = "logBox";
+        logBox.Size = new Size( 260, 304 );
+        logBox.TabIndex = 0;
+        // 
+        // button1
+        // 
+        button1.Location = new Point( 145, 326 );
+        button1.Name = "button1";
+        button1.Size = new Size( 127, 23 );
+        button1.TabIndex = 2;
+        button1.Text = "Quit";
+        button1.UseVisualStyleBackColor = true;
+        // 
+        // button2
+        // 
+        button2.Location = new Point( 12, 326 );
+        button2.Name = "button2";
+        button2.Size = new Size( 127, 23 );
+        button2.TabIndex = 1;
+        button2.Text = "button2";
+        button2.UseVisualStyleBackColor = true;
         // 
         // Window
         // 
         AutoScaleDimensions = new SizeF( 7F, 15F );
         AutoScaleMode = AutoScaleMode.Font;
         ClientSize = new Size( 284, 361 );
+        Controls.Add( button2 );
+        Controls.Add( button1 );
+        Controls.Add( logBox );
         FormBorderStyle = FormBorderStyle.FixedSingle;
         MaximizeBox = false;
         Name = "Window";
@@ -43,4 +78,8 @@ partial class Window
     }
 
     #endregion
+
+    private ListBox logBox;
+    private Button button1;
+    private Button button2;
 }

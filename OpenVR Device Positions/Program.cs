@@ -10,16 +10,10 @@ internal static class Program
     [STAThread]
     static void Main()
     {
-        Log.RegisterSink( verbose: true, ( text ) => Debug.Write( $"{text}\n" ) );
-
-        var vrManager = VRManager.Init();
-        if ( vrManager is null )
-        {
-            return;
-        }    
+        Log.RegisterSink( verbose: true, ( text ) => Debug.Write( $"{text}\n" ) );   
 
         ApplicationConfiguration.Initialize();
-        Application.Run( new Window( vrManager ) );
+        Application.Run( new Window() );
 
         VRManager.Shutdown();
     }
