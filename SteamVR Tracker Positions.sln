@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34309.116
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SteamVR Tracker Positions", "SteamVR Tracker Positions\SteamVR Tracker Positions.csproj", "{5B779436-39F8-483C-9E2D-30217E0FF2CF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5B779436-39F8-483C-9E2D-30217E0FF2CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B779436-39F8-483C-9E2D-30217E0FF2CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B779436-39F8-483C-9E2D-30217E0FF2CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B779436-39F8-483C-9E2D-30217E0FF2CF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {47D33158-D904-494C-A544-CC0FC0BA8DFD}
+	EndGlobalSection
+EndGlobal
