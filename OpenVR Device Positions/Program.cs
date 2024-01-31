@@ -10,11 +10,15 @@ internal static class Program
     [STAThread]
     static void Main()
     {
-        Log.RegisterSink( verbose: true, ( text ) => Debug.Write( $"{text}\n" ) );   
+        Log.RegisterSink( verbose: true, ( text ) => Debug.Write( $"{text}\n" ) );
+
+        var overlayThread = new OverlayThread();
+
+        overlayThread.Start();
 
         ApplicationConfiguration.Initialize();
         Application.Run( new Window() );
 
-        VRManager.Shutdown();
+        overlayThread.Stop();
     }
 }
