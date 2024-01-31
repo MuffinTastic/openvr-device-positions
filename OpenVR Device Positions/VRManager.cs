@@ -7,7 +7,7 @@ public class VRManager
 {
     private static Dictionary<EVRInitError, string> InitErrorReasons = new Dictionary<EVRInitError, string>()
     {
-        { EVRInitError.Init_NoServerForBackgroundApp, "SteamVR is not running" },
+        
     };
 
     private CVRSystem _cVRSystem;
@@ -17,14 +17,32 @@ public class VRManager
         _cVRSystem = cVRSystem;
     }
 
-    public static VRManager? Init()
+    public static VRManager? Init( CancellationToken ct )
     {
         EVRInitError initError = EVRInitError.None;
         var cVRSystem = OpenVR.Init( ref initError, EVRApplicationType.VRApplication_Background );
+
+        if ( initError == EVRInitError.Init_NoServerForBackgroundApp )
+        {
+            // Server isn't running, let's wait for it to launch 
+            Log.Text( "Waiting for VR..." );
+
+            while ( initError == EVRInitError.Init_NoServerForBackgroundApp )
+            {
+                if ( ct.IsCancellationRequested )
+                    return null;
+
+                Thread.Sleep( 500 );
+                cVRSystem = OpenVR.Init( ref initError, EVRApplicationType.VRApplication_Background );
+            }
+        }
+
         if ( initError != EVRInitError.None )
         {
-            string errorReason = InitErrorReasons.GetValueOrDefault( initError ) ?? initError.ToString();
-            MessageBox.Show( $"SteamVR Init error: {errorReason}", "SteamVR Tracker Positions", MessageBoxButtons.OK, MessageBoxIcon.Error );
+            string errorString = InitErrorReasons.GetValueOrDefault( initError ) ?? initError.ToString();
+            string reason = $"Error: Couldn't connect to VR: {errorString}";
+            Log.Text( reason );
+            MessageBox.Show( reason, "OpenVR Device Positions", MessageBoxButtons.OK, MessageBoxIcon.Error );
             return null;
         }
 

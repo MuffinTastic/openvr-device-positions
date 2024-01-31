@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading.Channels;
 
 namespace OVRDP;
 
@@ -6,15 +7,22 @@ public partial class Window : Form
 {
     private const int c_MaxLogItems = 100;
 
-    public Window()
+    private CancellationToken _ct;
+    private Channel<string> _channel;
+
+    public Window( CancellationToken ct )
     {
+        _ct = ct;
+        _channel = Channel.CreateUnbounded<string>();
+
         InitializeComponent();
 
         logBox.DrawMode = DrawMode.OwnerDrawVariable;
         logBox.MeasureItem += logBox_MeasureItem;
         logBox.DrawItem += logBox_DrawItem;
 
-        Log.RegisterSink( verbose: false, logBox_Record );
+        logBox_Pump();
+        Log.RegisterSink( verbose: false, logBox_Sink );
 
         newMsgLoop();
     }
@@ -23,7 +31,7 @@ public partial class Window : Form
     {
         while ( true )
         {
-            Log.Text( " test " );
+            Log.Text( "Main hello" );
             await Task.Delay( 750 );
         }
     }
@@ -43,14 +51,27 @@ public partial class Window : Form
         e.Graphics.DrawString( logBox.Items[e.Index].ToString(), e.Font!, new SolidBrush( e.ForeColor ), e.Bounds );
     }
 
-    private void logBox_Record( string text )
+    private void logBox_Sink( string text )
     {
-        logBox.Items.Add( text );
+        _channel.Writer.TryWrite( text );
+    }
 
-        if ( logBox.Items.Count > c_MaxLogItems )
-            logBox.Items.RemoveAt( 0 );
+    private async void logBox_Pump()
+    {
+        await foreach ( var message in _channel.Reader.ReadAllAsync( _ct ) )
+        {
+            logBox.Items.Add( message );
 
-        // Scroll to bottom
-        logBox.TopIndex = logBox.Items.Count - 1;
+            if ( logBox.Items.Count > c_MaxLogItems )
+                logBox.Items.RemoveAt( 0 );
+
+            // Scroll to bottom
+            logBox.TopIndex = logBox.Items.Count - 1;
+        }
+    }
+
+    private void quitButton_Click( object sender, EventArgs e )
+    {
+        Application.Exit();
     }
 }

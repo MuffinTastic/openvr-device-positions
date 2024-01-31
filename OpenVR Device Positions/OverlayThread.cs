@@ -1,27 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 
 namespace OVRDP;
 
-public class OverlayThread
+public static class OverlayThread
 {
+    private static CancellationToken _ct;
+
     #region Main thread
 
-    private CancellationTokenSource? _cts = null;
-    private Thread? _thread = null;
+    private static Thread? _thread = null;
 
-    public OverlayThread()
+    public static void Start( CancellationToken ct )
     {
-
-    }
-
-    public void Start()
-    {
-        _cts = new();
-        _ct = _cts.Token;
+        _ct = ct;
 
         _thread = new Thread( Threaded );
         _thread.Start();
@@ -29,16 +26,8 @@ public class OverlayThread
         Log.Text( "Started overlay thread" );
     }
 
-    public void Stop()
+    public static void WaitForStop()
     {
-        if ( _cts is null )
-        {
-            Log.Text( "Error: Tried to cancel null token source" );
-            return;
-        }
-
-        _cts.Cancel();
-
         if (  _thread is null )
         {
             Log.Text( "Error: Overlay thread is null, can't block" );
@@ -47,7 +36,6 @@ public class OverlayThread
 
         _thread.Join( 1000 );
 
-        _cts = null;
         _thread = null;
 
         Log.Text( "Stopped overlay thread" );
@@ -57,21 +45,31 @@ public class OverlayThread
 
     #region Overlay thread
 
-    private CancellationToken _ct;
+    private static VRManager? _vrManager = null;
 
-    private void Threaded()
+    private static void Threaded()
     {
+        Thread.Sleep( 500 );
+
         Init();
-        CancellableLoop();
+        Loop();
         Cleanup();
     }
 
-    private void Init()
+    private static void Init()
     {
-        Log.Text( "Thread init" );
+        // VRManager.Init waits indefinitely for SteamVR to launch
+        // if it's not already running
+        _vrManager = VRManager.Init( _ct );
+        if ( _vrManager is null )
+        {
+            // We hit a fatal error
+            Environment.Exit( 1 );
+        }
     }
 
-    private void CancellableLoop()
+    // Cancellable by main thread
+    private static void Loop()
     {
         while ( !_ct.IsCancellationRequested )
         {
@@ -80,7 +78,7 @@ public class OverlayThread
         }
     }
 
-    private void Cleanup()
+    private static void Cleanup()
     {
         Log.Text( "Thread cleanup" );
     }

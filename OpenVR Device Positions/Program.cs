@@ -10,15 +10,19 @@ internal static class Program
     [STAThread]
     static void Main()
     {
+        CancellationTokenSource cts = new();
+        CancellationToken ct = cts.Token;
+
         Log.RegisterSink( verbose: true, ( text ) => Debug.Write( $"{text}\n" ) );
 
-        var overlayThread = new OverlayThread();
-
-        overlayThread.Start();
-
+        Log.Text( "Starting OVRDP" );
+        OverlayThread.Start( ct );
+        
         ApplicationConfiguration.Initialize();
-        Application.Run( new Window() );
+        Application.Run( new Window( ct ) );
 
-        overlayThread.Stop();
+        Log.Text( "Quitting OVRDP" );
+        cts.Cancel();
+        OverlayThread.WaitForStop();
     }
 }
