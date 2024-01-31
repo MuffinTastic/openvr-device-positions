@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using Valve.VR;
 
-namespace SteamVR_Device_Positions;
+namespace OVRDP;
 
 public class VRManager
 {

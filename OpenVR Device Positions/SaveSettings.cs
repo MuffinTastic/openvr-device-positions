@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SteamVR_Device_Positions;
+namespace OVRDP;
 
 internal struct SaveSettings
 {

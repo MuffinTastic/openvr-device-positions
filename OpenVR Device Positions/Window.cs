@@ -1,4 +1,4 @@
-namespace SteamVR_Device_Positions;
+namespace OVRDP;
 
 public partial class Window : Form
 {
