@@ -17,4 +17,10 @@
     <Exec Command="copy &quot;$(SolutionDir)openvr\headers\openvr_api.cs&quot; &quot;$(ProjectDir)\External&quot;" />
   </Target>
 
+  <ItemGroup>
+    <PackageReference Include="Veldrid" Version="4.9.0" />
+    <PackageReference Include="Veldrid.ImGui" Version="5.72.0" />
+    <PackageReference Include="Veldrid.StartupUtilities" Version="4.9.0" />
+  </ItemGroup>
+
 </Project>

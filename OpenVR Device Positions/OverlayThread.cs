@@ -1,10 +1,14 @@
-﻿using System;
+﻿using ImGuiNET;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Channels;
 using System.Threading.Tasks;
+using Veldrid;
+using Veldrid.Sdl2;
+using Veldrid.StartupUtilities;
 
 namespace OVRDP;
 
@@ -47,6 +51,15 @@ public static class OverlayThread
 
     private static VRManager? _vrManager = null;
 
+    private const int c_Width = 512;
+    private const int c_Height = 512;
+
+    private static int frameCap = 60;
+    private static Sdl2Window window;
+    private static GraphicsDevice device;
+    private static ImGuiRenderer renderer;
+    private static CommandList commandList;
+
     private static void Threaded()
     {
         Thread.Sleep( 500 );
@@ -60,12 +73,21 @@ public static class OverlayThread
     {
         // VRManager.Init waits indefinitely for SteamVR to launch
         // if it's not already running
-        _vrManager = VRManager.Init( _ct );
-        if ( _vrManager is null )
-        {
-            // We hit a fatal error
-            Environment.Exit( 1 );
-        }
+        // _vrManager = VRManager.Init( _ct );
+        // if ( _vrManager is null )
+        // {
+        //     // We hit a fatal error
+        //     Environment.Exit( 1 );
+        // }
+
+        VeldridStartup.CreateWindowAndGraphicsDevice(
+            new WindowCreateInfo( 100, 100, c_Width, c_Height, Veldrid.WindowState.Normal, "test" ),
+            out window, out device );
+
+        renderer = new ImGuiRenderer( device, device.MainSwapchain.Framebuffer.OutputDescription,
+            (int) device.MainSwapchain.Framebuffer.Width, (int) device.MainSwapchain.Framebuffer.Height );
+
+        commandList = device.ResourceFactory.CreateCommandList();
     }
 
     // Cancellable by main thread
@@ -73,7 +95,24 @@ public static class OverlayThread
     {
         while ( !_ct.IsCancellationRequested )
         {
-            Thread.Sleep( 500 );
+            var input = window.PumpEvents();
+            if ( !window.Exists ) { break; }
+            renderer.Update( 1f / 60f, input ); // Compute actual value for deltaSeconds.
+
+            // Draw stuff
+            ImGui.Text( "Hello World" );
+            if ( ImGui.Button( "Test" ) )
+            {
+                Log.Text( "you pressed the button" );
+            }
+
+            commandList.Begin();
+            commandList.SetFramebuffer( device.MainSwapchain.Framebuffer );
+            commandList.ClearColorTarget( 0, RgbaFloat.Black );
+            renderer.Render( device, commandList );
+            commandList.End();
+            device.SubmitCommands( commandList );
+            device.SwapBuffers( device.MainSwapchain );
         }
     }
 
