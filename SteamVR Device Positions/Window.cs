@@ -2,8 +2,12 @@ namespace SteamVR_Tracker_Positions;
 
 public partial class Window : Form
 {
-    public Window()
+    private VRManager _vrManager;
+
+    public Window( VRManager vrManager )
     {
+        _vrManager = vrManager;
+
         InitializeComponent();
         saveProgressBar.Visible = false;
     }
@@ -13,25 +17,26 @@ public partial class Window : Form
         saveButton.Enabled = false;
         saveProgressBar.Visible = true;
 
-        int num = 5;
-        saveProgressBar.Maximum = num;
+        int countdown = (int) countdownInput.Value;
+        saveProgressBar.Maximum = countdown;
 
-        while ( num > 0 )
+        while ( countdown > 0 )
         {
-            saveProgressBar.Value = num;
-            saveButton.Text = $"Saving in {num}...";
-            num--;
+            saveProgressBar.Value = countdown;
+            saveButton.Text = $"Saving in {countdown}...";
+            countdown--;
             await Task.Delay( 1000 );
         }
 
-        saveProgressBar.Value = num;
+        saveProgressBar.Value = countdown;
         saveProgressBar.Visible = false;
         saveButton.Text = $"Saving...";
 
-
+        bool centerOnHMD = centerCheckbox.Checked;
+        _vrManager.GetPositions( centerOnHMD );
 
         saveButton.Text = $"Saved";
-        await Task.Delay( 1000 );
+        await Task.Delay( 500 );
 
         saveButton.Text = $"Save";
         saveButton.Enabled = true;
