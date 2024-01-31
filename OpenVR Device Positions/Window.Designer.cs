@@ -38,7 +38,7 @@ partial class Window
         FormBorderStyle = FormBorderStyle.FixedSingle;
         MaximizeBox = false;
         Name = "Window";
-        Text = "SteamVR Device Positions";
+        Text = "OpenVR Device Positions";
         ResumeLayout( false );
     }
 
