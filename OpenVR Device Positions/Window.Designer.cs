@@ -35,7 +35,6 @@ partial class Window
         // 
         // logBox
         // 
-        logBox.Enabled = false;
         logBox.ForeColor = SystemColors.WindowFrame;
         logBox.FormattingEnabled = true;
         logBox.ItemHeight = 15;
