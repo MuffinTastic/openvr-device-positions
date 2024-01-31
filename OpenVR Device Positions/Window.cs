@@ -35,6 +35,9 @@ public partial class Window : Form
 
     private void logBox_DrawItem( object? sender, DrawItemEventArgs e )
     {
+        if ( e.Index < 0 )
+            return;
+
         e.DrawBackground();
         e.DrawFocusRectangle();
         e.Graphics.DrawString( logBox.Items[e.Index].ToString(), e.Font!, new SolidBrush( e.ForeColor ), e.Bounds );
