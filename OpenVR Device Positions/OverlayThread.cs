@@ -73,7 +73,6 @@ public static class OverlayThread
     {
         while ( !_ct.IsCancellationRequested )
         {
-            Log.Text( "Thread hello" );
             Thread.Sleep( 500 );
         }
     }

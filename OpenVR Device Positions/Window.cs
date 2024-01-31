@@ -23,17 +23,6 @@ public partial class Window : Form
 
         logBox_Pump();
         Log.RegisterSink( verbose: false, logBox_Sink );
-
-        newMsgLoop();
-    }
-
-    private async void newMsgLoop()
-    {
-        while ( true )
-        {
-            Log.Text( "Main hello" );
-            await Task.Delay( 750 );
-        }
     }
 
     // Log ListBox word wrapping adapted from Kosmo—ë's implementation
