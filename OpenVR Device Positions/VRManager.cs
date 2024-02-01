@@ -46,6 +46,8 @@ public class VRManager
             return null;
         }
 
+        Log.Text( "Connected to VR" );
+
         return new VRManager( cVRSystem );
     }
 
@@ -59,15 +61,17 @@ public class VRManager
     {
         HashSet<ETrackedDeviceClass> desiredClasses = GetDesiredClasses( saveSettings );
 
-        Debug.Write( $"\nSaving devices: \n" );
+        Log.Text( $"Saving devices:" );
 
         for ( uint i = 0; i < OpenVR.k_unMaxTrackedDeviceCount; i++ )
         {
             var deviceClass = _cVRSystem.GetTrackedDeviceClass( i );
             if ( !desiredClasses.Contains( deviceClass ) ) continue;
 
-            Debug.Write( $"{deviceClass}\n" );
+            Log.Text( $"  {deviceClass}" );
         }
+
+        Log.Text( "Done" );
     }
 
     private HashSet<ETrackedDeviceClass> GetDesiredClasses( SaveSettings saveSettings )

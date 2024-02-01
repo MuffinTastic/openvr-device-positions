@@ -72,12 +72,12 @@ public static class OverlayThread
     {
         // VRManager.Init waits indefinitely for SteamVR to launch
         // if it's not already running
-        // _vrManager = VRManager.Init( _ct );
-        // if ( _vrManager is null )
-        // {
-        //     // We hit a fatal error
-        //     Environment.Exit( 1 );
-        // }
+        _vrManager = VRManager.Init( _ct );
+        if ( _vrManager is null )
+        {
+            // We hit a fatal error
+            Environment.Exit( 1 );
+        }
 
         Log.Text( "Veldrid init" );
         VeldridStartup.CreateWindowAndGraphicsDevice(
@@ -94,7 +94,7 @@ public static class OverlayThread
         commandList = device.ResourceFactory.CreateCommandList();
 
         Theme.SetDefault();
-        _overlay = new Overlay( _vrManager! );
+        _overlay = new Overlay( _vrManager );
 
         Log.Text( "Overlay opened" );
     }

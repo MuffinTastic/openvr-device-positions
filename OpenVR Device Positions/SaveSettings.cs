@@ -6,13 +6,12 @@ using System.Threading.Tasks;
 
 namespace OVRDP;
 
-internal struct SaveSettings
+public struct SaveSettings
 {
-    public bool UseModels;
-    public bool CenterOnHMD;
-
-    public bool SaveBaseStations;
-    public bool SaveHMD;
-    public bool SaveControllers;
-    public bool SaveTrackers;
+    required public bool UseDeviceModels;
+    required public bool CenterOnHMD;
+    required public bool SaveBaseStations;
+    required public bool SaveHMD;
+    required public bool SaveControllers;
+    required public bool SaveTrackers;
 }

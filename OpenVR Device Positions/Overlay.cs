@@ -68,7 +68,7 @@ public class Overlay
         public bool Cancelled { get; set; } = false;
     }
 
-    private CountdownState? _countdownState = null;
+    private CountdownState? _saveCountdownState = null;
     private bool _iSaveDisabled = false;
 
     public void UpdateUI()
@@ -90,7 +90,7 @@ public class Overlay
         // Supplying no text breaks the slider below
         if ( ImGui.InvisibleButton( ":)", secretButtonSize ) ) Theme.Toggle();
 
-        if ( _countdownState is not null )
+        if ( _saveCountdownState is not null )
             ImGui.BeginDisabled();
 
         ImGui.Checkbox( "Use Device Models", ref _iUseDeviceModels );
@@ -111,20 +111,20 @@ public class Overlay
         ImGui.SameLine( halfWidth );
         ImGui.Checkbox( "Trackers       ", ref _iSaveTrackers );
 
-        if ( _countdownState is not null )
+        if ( _saveCountdownState is not null )
             ImGui.EndDisabled();
 
         ImGui.SeparatorText( "" );
 
-        if ( _countdownState is not null )
+        if ( _saveCountdownState is not null )
         {
             // Do this up here to avoid null refs
-            float frac = (float) _countdownState.Current / _countdownState.MaxSeconds;
+            float frac = (float) _saveCountdownState.Current / _saveCountdownState.MaxSeconds;
 
-            if ( ImGui.Button( $"Abort ({_countdownState.Current})", ImGui.GetContentRegionAvail() ) )
+            if ( ImGui.Button( $"Abort ({_saveCountdownState.Current})", ImGui.GetContentRegionAvail() ) )
             {
-                _countdownState.Cancelled = true;
-                _countdownState = null;
+                _saveCountdownState.Cancelled = true;
+                _saveCountdownState = null;
             }
 
             var verticalPadding = ImGui.GetStyle().CellPadding.Y;
@@ -139,12 +139,22 @@ public class Overlay
 
             if ( ImGui.Button( _iSaveDisabled ? "Saved" : "Save", ImGui.GetContentRegionAvail() ) )
             {
-                _countdownState = new CountdownState
+                _saveCountdownState = new CountdownState
                 {
                     MaxSeconds = _iCountdownSeconds
                 };
 
-                RunCountdown( _countdownState );
+                var saveSettings = new SaveSettings
+                {
+                    UseDeviceModels = _iUseDeviceModels,
+                    CenterOnHMD = _iCenterOnHMD,
+                    SaveBaseStations = _iSaveBaseStations,
+                    SaveHMD = _iSaveHMD,
+                    SaveControllers = _iSaveControllers,
+                    SaveTrackers = _iSaveTrackers
+                };
+
+                RunSaveCountdown( _saveCountdownState, saveSettings );
             }
 
             if ( _iSaveDisabled )
@@ -203,7 +213,7 @@ public class Overlay
         ImGui.PopStyleColor(6);
     }
 
-    private async void RunCountdown( CountdownState state )
+    private async void RunSaveCountdown( CountdownState state, SaveSettings saveSettings )
     {
         state.Current = state.MaxSeconds;
 
@@ -218,19 +228,13 @@ public class Overlay
             }
 
             state.Current--;
-
         }
 
-        _countdownState = null;
+        _saveCountdownState = null;
 
-        Log.Text( "Saving..." );
         _iSaveDisabled = true;
-
-
-
+        _vrManager.SavePositions( saveSettings );
         await Task.Delay( 750 );
         _iSaveDisabled = false;
-
-        Log.Text( "Saved" );
     }
 }
