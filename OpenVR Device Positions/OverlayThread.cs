@@ -49,15 +49,13 @@ public static class OverlayThread
 
     #region Overlay thread
 
-    private static VRManager? _vrManager = null;
+    private static float _frameCap = 90.0f;
+    private static Sdl2Window _window;
+    private static GraphicsDevice _device;
+    private static ImGuiRenderer _renderer;
+    private static CommandList _commandList;
 
-    private static int frameCap = 60;
-    private static Sdl2Window window;
-    private static GraphicsDevice device;
-    private static ImGuiRenderer renderer;
-    private static CommandList commandList;
-
-    private static OverlayUI _overlay;
+    private static OVROverlayWrapper? _ovrOverlay = null;
 
     private static void Threaded()
     {
@@ -70,33 +68,42 @@ public static class OverlayThread
 
     private static void Init()
     {
-        // VRManager.Init waits indefinitely for SteamVR to launch
-        // if it's not already running
-        _vrManager = VRManager.Init( _ct );
-        if ( _vrManager is null )
+        if ( !OVRManager.Init( _ct ) )
         {
             // We hit a fatal error
             Environment.Exit( 1 );
         }
 
+
+
         Log.Text( "Veldrid init" );
         VeldridStartup.CreateWindowAndGraphicsDevice(
-            new WindowCreateInfo( 100, 100, OverlayUI.Width, OverlayUI.Height, WindowState.Normal, "Overlay Test" ),
+            new WindowCreateInfo( 100, 100, OverlayConstants.RenderWidth, OverlayConstants.RenderHeight, WindowState.Normal, "Overlay Test" ),
             new GraphicsDeviceOptions() { SyncToVerticalBlank = true },
             GraphicsBackend.Direct3D11,
-            out window, out device );
+            out _window, out _device );
 
-        Log.Text( $"Backend: {device.BackendType}" );
+        Log.Text( $"Backend: {_device.BackendType}" );
 
-        renderer = new ImGuiRenderer( device, device.MainSwapchain.Framebuffer.OutputDescription,
-            (int) device.MainSwapchain.Framebuffer.Width, (int) device.MainSwapchain.Framebuffer.Height );
+        _renderer = new ImGuiRenderer( _device, _device.MainSwapchain.Framebuffer.OutputDescription,
+            (int) _device.MainSwapchain.Framebuffer.Width, (int) _device.MainSwapchain.Framebuffer.Height );
 
-        commandList = device.ResourceFactory.CreateCommandList();
+        _commandList = _device.ResourceFactory.CreateCommandList();
 
         Theme.SetDefault();
-        _overlay = new OverlayUI( _vrManager );
 
-        Log.Text( "Overlay opened" );
+        _ovrOverlay = OVRManager.CreateOverlay(
+            _device.ResourceFactory,
+            OverlayConstants.RenderWidth, OverlayConstants.RenderHeight,
+            "ovrdp-overlay", "ovrdp"
+        );
+        if ( _ovrOverlay is null )
+        {
+            OVRManager.Shutdown();
+            Environment.Exit( 1 );
+        }
+
+        OverlayUI.Open( _ovrOverlay );
     }
 
     // Cancellable by main thread
@@ -104,26 +111,26 @@ public static class OverlayThread
     {
         while ( !_ct.IsCancellationRequested )
         {
-            var input = window.PumpEvents();
-            if ( !window.Exists ) { break; }
-            renderer.Update( 1f / 60f, input ); // Compute actual value for deltaSeconds.
+            var input = _window.PumpEvents();
+            if ( !_window.Exists ) { break; }
+            _renderer.Update( 1f / 60f, input ); // Compute actual value for deltaSeconds.
 
-            _overlay.UpdateUI();
+            OverlayUI.UpdateUI();
 
-            commandList.Begin();
-            commandList.SetFramebuffer( device.MainSwapchain.Framebuffer );
-            commandList.ClearColorTarget( 0, RgbaFloat.Black );
-            renderer.Render( device, commandList );
-            commandList.End();
-            device.SubmitCommands( commandList );
-            device.SwapBuffers( device.MainSwapchain );
+            _commandList.Begin();
+            _commandList.SetFramebuffer( _device.MainSwapchain.Framebuffer );
+            _commandList.ClearColorTarget( 0, RgbaFloat.Black );
+            _renderer.Render( _device, _commandList );
+            _commandList.End();
+            _device.SubmitCommands( _commandList );
+            _device.SwapBuffers( _device.MainSwapchain );
         }
     }
 
     private static void Cleanup()
     {
         Log.Text( "Overlay cleanup" );
-        _overlay.Close();
+        OverlayUI.Close();
     }
 
     #endregion

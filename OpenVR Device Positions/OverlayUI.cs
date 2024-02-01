@@ -7,59 +7,82 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using Valve.VR;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace OVRDP;
 
-public class OverlayUI
+public static class OverlayUI
 {
-    public const int Width = 320;
-    public const int Height = 300;
+    private const int ICountdownMin = 0;
+    private const int ICountdownMax = 15;
 
     private const int HelpHeight = 96;
     private const int HelpOffset = 4;
 
-    public Vector3 Position { get; set; }
-    public Quaternion Rotation { get; set; }
 
-    private VRManager _vrManager;
+    private static Vector3 _position;
+    private static Quaternion _rotation;
 
-    public OverlayUI( VRManager vrManager )
+    private static OVROverlayWrapper? _ovrOverlay = null;
+
+    public static bool Open( OVROverlayWrapper ovrOverlay )
     {
-        _vrManager = vrManager;
+        _ovrOverlay = ovrOverlay;
+
+        _ovrOverlay.SetWidthInMeters( OverlayConstants.VRWidth );
+        _ovrOverlay.SetColor( new Vector3( 1.0f ) );
+
+        VRTextureBounds_t bounds = new()
+        {
+            uMin = 0,
+            uMax = 1,
+            vMin = 0,
+            vMax = 1
+        };
+        _ovrOverlay.SetTextureBounds( bounds );
+
+        _ovrOverlay.Show();
+
+        Log.Text( "Created overlay" );
+
+        return true;
+    }
+
+    public static void Close()
+    {
+        if ( _ovrOverlay is null )
+            return;
+
+        _ovrOverlay.Hide();
+        _ovrOverlay.Close();
+
+        Log.Text( "Closed overlay" );
+    }
+
+    public static void UpdateTransform()
+    {
 
     }
 
-    public void Close()
-    {
-
-    }
-
-    public void UpdateTransform()
-    {
-
-    }
-
-    private void SubmitTransform()
+    private static void SubmitTransform()
     {
 
     }
 
 
     // i for input
-    private bool _iUseDeviceModels = true;
-    private bool _iCenterOnHMD = true;
-    private const int _iCountdownMin = 0;
-    private const int _iCountdownMax = 15;
-    private int _iCountdownSeconds = 5;
+    private static bool _iUseDeviceModels = true;
+    private static bool _iCenterOnHMD = true;
+    private static int _iCountdownSeconds = 5;
 
-    private bool _iSaveBaseStations = true;
-    private bool _iSaveHMD = true;
-    private bool _iSaveControllers = true;
-    private bool _iSaveTrackers = true;
+    private static bool _iSaveBaseStations = true;
+    private static bool _iSaveHMD = true;
+    private static bool _iSaveControllers = true;
+    private static bool _iSaveTrackers = true;
 
-    private bool _focusHelp = false;
-    private string? _helpText = null;
+    private static bool _focusHelp = false;
+    private static string? _helpText = null;
 
     private class CountdownState
     {
@@ -68,13 +91,13 @@ public class OverlayUI
         public bool Cancelled { get; set; } = false;
     }
 
-    private CountdownState? _saveCountdownState = null;
-    private bool _iSaveDisabled = false;
+    private static CountdownState? _saveCountdownState = null;
+    private static bool _iSaveDisabled = false;
 
-    public void UpdateUI()
+    public static void UpdateUI()
     {
         ImGui.SetNextWindowPos( new Vector2( 0.0f, 0.0f ) );
-        ImGui.SetNextWindowSize( new Vector2( Width, Height ) );
+        ImGui.SetNextWindowSize( new Vector2( OverlayConstants.RenderWidth, OverlayConstants.RenderHeight ) );
 
         ImGui.Begin( "OpenVR Device Positions",
             ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoCollapse );
@@ -103,7 +126,7 @@ public class OverlayUI
         ImGui.SameLine(); HelpMarker( "Put the HMD at the origin of the FBX and reposition everything else relative to it" );
         ImGui.PushItemWidth( availableSpace.X );
         string format = ( _iCountdownSeconds > 0 ) ? "%ds" : "Off";
-        ImGui.SliderInt( "", ref _iCountdownSeconds, _iCountdownMin, _iCountdownMax, $"Countdown: {format}" );
+        ImGui.SliderInt( "", ref _iCountdownSeconds, ICountdownMin, ICountdownMax, $"Countdown: {format}" );
         ImGui.PopItemWidth();
 
         ImGui.SeparatorText( "Devices" );
@@ -178,8 +201,8 @@ public class OverlayUI
             var childBg = ImGui.GetStyle().Colors[(int) ImGuiCol.ChildBg];
 
             ImGui.PushStyleColor( ImGuiCol.WindowBg, childBg );
-            ImGui.SetNextWindowPos( new Vector2( HelpOffset, Height - HelpOffset - HelpHeight ) );
-            ImGui.SetNextWindowSize( new Vector2( Width - HelpOffset * 2, HelpHeight ) );
+            ImGui.SetNextWindowPos( new Vector2( HelpOffset, OverlayConstants.RenderHeight - HelpOffset - HelpHeight ) );
+            ImGui.SetNextWindowSize( new Vector2( OverlayConstants.RenderWidth - HelpOffset * 2, HelpHeight ) );
             ImGui.Begin( "Help",
                 ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoCollapse );
 
@@ -193,7 +216,7 @@ public class OverlayUI
         }
     }
 
-    private void HelpMarker( string helpText )
+    private static void HelpMarker( string helpText )
     {
         ImGui.SetCursorPos( ImGui.GetCursorPos() + new Vector2( 10.0f, 0.0f ) );
 
@@ -213,11 +236,10 @@ public class OverlayUI
             _focusHelp = true;
         }
 
-
         ImGui.PopStyleColor(6);
     }
 
-    private async void RunSaveCountdown( CountdownState state, SaveSettings saveSettings )
+    private static async void RunSaveCountdown( CountdownState state, SaveSettings saveSettings )
     {
         state.Current = state.MaxSeconds;
 
@@ -236,7 +258,7 @@ public class OverlayUI
         _saveCountdownState = null;
 
         _iSaveDisabled = true;
-        _vrManager.SavePositions( saveSettings );
+        OVRManager.SavePositions( saveSettings );
         await Task.Delay( 750 );
         _iSaveDisabled = false;
     }
