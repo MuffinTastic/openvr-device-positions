@@ -1,6 +1,7 @@
 ﻿using ImGuiNET;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -50,6 +51,8 @@ public static class OverlayThread
     #region Overlay thread
 
     private static float _frameCap = 90.0f;
+    private static float _targetFrameTimeFloat = 1.0f / _frameCap;
+    private static TimeSpan _targetFrameTime = default;
     private static Sdl2Window _window;
     private static GraphicsDevice _device;
     private static ImGuiRenderer _renderer;
@@ -74,7 +77,9 @@ public static class OverlayThread
             Environment.Exit( 1 );
         }
 
-
+        _frameCap = OVRManager.GetRefreshRate();
+        _targetFrameTimeFloat = 1.0f / _frameCap;
+        _targetFrameTime = TimeSpan.FromSeconds( _targetFrameTimeFloat );
 
         Log.Text( "Veldrid init" );
         VeldridStartup.CreateWindowAndGraphicsDevice(
@@ -82,8 +87,6 @@ public static class OverlayThread
             new GraphicsDeviceOptions() { SyncToVerticalBlank = true },
             GraphicsBackend.Direct3D11,
             out _window, out _device );
-
-        Log.Text( $"Backend: {_device.BackendType}" );
 
         _renderer = new ImGuiRenderer( _device, _device.MainSwapchain.Framebuffer.OutputDescription,
             (int) _device.MainSwapchain.Framebuffer.Width, (int) _device.MainSwapchain.Framebuffer.Height );
@@ -109,11 +112,15 @@ public static class OverlayThread
     // Cancellable by main thread
     private static void Loop()
     {
+        var stopwatch = new Stopwatch();
+        float delta = _targetFrameTimeFloat;
+
         while ( !_ct.IsCancellationRequested )
         {
+            stopwatch.Restart();
             var input = _window.PumpEvents();
             if ( !_window.Exists ) { break; }
-            _renderer.Update( 1f / 60f, input ); // Compute actual value for deltaSeconds.
+            _renderer.Update( delta, input );
 
             OverlayUI.UpdateUI();
 
@@ -124,7 +131,14 @@ public static class OverlayThread
             _commandList.End();
             _device.SubmitCommands( _commandList );
             _device.SwapBuffers( _device.MainSwapchain );
+
+            var wait = _targetFrameTime - stopwatch.Elapsed;
+            if ( wait.TotalSeconds > 0.0f )
+                Thread.Sleep( wait );
+            delta = (float) stopwatch.Elapsed.TotalSeconds;
         }
+
+        stopwatch.Stop();
     }
 
     private static void Cleanup()
