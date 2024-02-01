@@ -13,8 +13,8 @@ public static class Theme
 {
     private static bool IsVGUI = false;
 
+    public static Vector4 HelpMarkerText { get; private set; }
     public static Vector4 HelpMarkerHover { get; private set; }
-    public static Vector4 HelpMarkerActive { get; private set; }
 
     public static void Toggle()
     {
@@ -87,8 +87,8 @@ public static class Theme
         style.Colors[(int) ImGuiCol.Button] = new Vector4( 0.2588235437870026f, 0.5882353186607361f, 0.9764705896377563f, 0.4000000059604645f );
         style.Colors[(int) ImGuiCol.ButtonHovered] = new Vector4( 0.2588235437870026f, 0.5882353186607361f, 0.9764705896377563f, 1.0f );
         style.Colors[(int) ImGuiCol.ButtonActive] = new Vector4( 0.05882352963089943f, 0.529411792755127f, 0.9764705896377563f, 1.0f );
+        HelpMarkerText = ( style.Colors[(int) ImGuiCol.Text] + style.Colors[(int) ImGuiCol.TextDisabled] ) / 2.0f;
         HelpMarkerHover = new Vector4( 0.25f, 0.25f, 0.25f, 0.8f );
-        HelpMarkerActive = new Vector4( 0.20f, 0.20f, 0.20f, 0.8f );
         style.Colors[(int) ImGuiCol.Header] = new Vector4( 0.2588235437870026f, 0.5882353186607361f, 0.9764705896377563f, 0.3100000023841858f );
         style.Colors[(int) ImGuiCol.HeaderHovered] = new Vector4( 0.2588235437870026f, 0.5882353186607361f, 0.9764705896377563f, 0.800000011920929f );
         style.Colors[(int) ImGuiCol.HeaderActive] = new Vector4( 0.2588235437870026f, 0.5882353186607361f, 0.9764705896377563f, 1.0f );
@@ -182,8 +182,8 @@ public static class Theme
         style.Colors[(int) ImGuiCol.Button] = new Vector4( 0.3834633529186249f, 0.4509803950786591f, 0.3466359078884125f, 0.4000000059604645f );
         style.Colors[(int) ImGuiCol.ButtonHovered] = new Vector4( 0.3490196168422699f, 0.4196078479290009f, 0.3098039329051971f, 1.0f );
         style.Colors[(int) ImGuiCol.ButtonActive] = new Vector4( 0.5372549295425415f, 0.5686274766921997f, 0.5098039507865906f, 0.5f );
-        HelpMarkerHover = new Vector4( 0.3490196168422699f, 0.4196078479290009f, 0.3098039329051971f, 1.0f );
-        HelpMarkerActive = new Vector4( 0.5372549295425415f, 0.5686274766921997f, 0.5098039507865906f, 0.5f );
+        HelpMarkerText = ( style.Colors[(int) ImGuiCol.Text] + style.Colors[(int) ImGuiCol.TextDisabled] ) / 2.0f;
+        HelpMarkerHover = new Vector4( 0.3490196168422699f, 0.4196078479290009f, 0.3098039329051971f, 0.6f );
         style.Colors[(int) ImGuiCol.Header] = new Vector4( 0.3490196168422699f, 0.4196078479290009f, 0.3098039329051971f, 1.0f );
         style.Colors[(int) ImGuiCol.HeaderHovered] = new Vector4( 0.3490196168422699f, 0.4196078479290009f, 0.3098039329051971f, 0.6000000238418579f );
         style.Colors[(int) ImGuiCol.HeaderActive] = new Vector4( 0.5372549295425415f, 0.5686274766921997f, 0.5098039507865906f, 0.5f );

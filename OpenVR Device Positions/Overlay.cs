@@ -84,6 +84,7 @@ public class Overlay
         ImGui.PopItemWidth();
 
         ImGui.SeparatorText( "Devices" );
+        // Extra spaces make it easier to click
         ImGui.Checkbox( "Base Stations  ", ref saveBaseStations );
         ImGui.SameLine( halfWidth );
         ImGui.Checkbox( "HMD            ", ref saveHMD );
@@ -94,7 +95,10 @@ public class Overlay
         ImGui.SeparatorText( "" );
 
         if ( ImGui.Button( "Save", ImGui.GetContentRegionAvail() ) )
+        {
             Log.Text( "hehe" );
+        }
+
         ImGui.End();
 
         if ( _focusHelp )
@@ -127,19 +131,22 @@ public class Overlay
     {
         ImGui.SetCursorPos( ImGui.GetCursorPos() + new Vector2( 10.0f, 0.0f ) );
 
-        var textDisabled = ImGui.GetStyle().Colors[(int) ImGuiCol.TextDisabled];
         ImGui.PushStyleColor( ImGuiCol.Border, new Vector4( 0.0f ) );
         ImGui.PushStyleColor( ImGuiCol.BorderShadow, new Vector4( 0.0f ) );
         ImGui.PushStyleColor( ImGuiCol.Button, new Vector4( 0.0f ) );
-        ImGui.PushStyleColor( ImGuiCol.Text, textDisabled );
+        ImGui.PushStyleColor( ImGuiCol.Text, Theme.HelpMarkerText );
         ImGui.PushStyleColor( ImGuiCol.ButtonHovered, Theme.HelpMarkerHover );
-        ImGui.PushStyleColor( ImGuiCol.ButtonActive, Theme.HelpMarkerActive );
+        ImGui.PushStyleColor( ImGuiCol.ButtonActive, Theme.HelpMarkerHover );
 
-        if ( ImGui.Button( "(?)" ) )
+        // You can't select the second marker if you
+        // call Button() normally here... Hate.
+        ImGui.Button( "(?)" );
+        if ( ImGui.IsItemClicked() )
         {
             _helpText = helpText;
             _focusHelp = true;
         }
+
 
         ImGui.PopStyleColor(6);
     }
