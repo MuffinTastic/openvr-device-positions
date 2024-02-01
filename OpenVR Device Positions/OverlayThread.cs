@@ -67,17 +67,34 @@ public static class OverlayThread
     {
         Thread.Sleep( 750 );
 
-        Init();
-        Loop();
-        Cleanup();
+        try
+        {
+            if ( !Init() )
+                return; // Cancelled
+
+            Loop();
+        }
+        catch ( Exception ex )
+        {
+            var message = $"Overlay error: {ex.Message}";
+            Log.Text( message );
+            MessageBox.Show( message, "OpenVR Device Positions", MessageBoxButtons.OK, MessageBoxIcon.Error );
+        }
+        finally
+        {
+            Cleanup();
+        }
     }
 
-    private static void Init()
+    /// <summary>
+    /// Initialize the overlay
+    /// A return value of false means the initialization was cancelled
+    /// </summary>
+    private static bool Init()
     {
         if ( !OVRManager.Init( _ct ) )
         {
-            // We hit a fatal error
-            Environment.Exit( 1 );
+            return false;
         }
 
         _frameCap = OVRManager.GetRefreshRate();
@@ -110,6 +127,8 @@ public static class OverlayThread
         }
 
         OverlayUI.Open( _ovrOverlay );
+
+        return true;
     }
 
     // Cancellable by main thread

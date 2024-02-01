@@ -13,6 +13,10 @@ public static class OVRManager
         
     };
 
+    /// <summary>
+    /// Initialize OpenVR
+    /// A return value of false means the initialization was cancelled
+    /// </summary>
     public static bool Init( CancellationToken ct )
     {
         EVRInitError initError = EVRInitError.None;
@@ -36,10 +40,8 @@ public static class OVRManager
         if ( initError != EVRInitError.None )
         {
             string errorString = InitErrorReasons.GetValueOrDefault( initError ) ?? initError.ToString();
-            string reason = $"Error: Couldn't connect to VR: {errorString}";
-            Log.Text( reason );
-            MessageBox.Show( reason, "OpenVR Device Positions", MessageBoxButtons.OK, MessageBoxIcon.Error );
-            return false;
+            string reason = $"Couldn't connect to VR: {errorString}";
+            throw new OverlayFatalException( reason );
         }
 
         Log.Text( "Connected to VR" );
