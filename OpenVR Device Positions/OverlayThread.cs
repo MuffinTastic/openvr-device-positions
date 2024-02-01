@@ -50,6 +50,8 @@ public static class OverlayThread
 
     #region Overlay thread
 
+    private const float _minFrameTarget = 10.0f;
+    private const float _minTargetFrameTime = 1.0f / _minFrameTarget;
     private static float _frameCap = 90.0f;
     private static float _targetFrameTimeFloat = 1.0f / _frameCap;
     private static TimeSpan _targetFrameTime = default;
@@ -62,7 +64,7 @@ public static class OverlayThread
 
     private static void Threaded()
     {
-        Thread.Sleep( 500 );
+        Thread.Sleep( 750 );
 
         Init();
         Loop();
@@ -115,6 +117,8 @@ public static class OverlayThread
         var stopwatch = new Stopwatch();
         float delta = _targetFrameTimeFloat;
 
+        TimeSpan maxWait = TimeSpan.FromSeconds( _minTargetFrameTime );
+
         while ( !_ct.IsCancellationRequested )
         {
             stopwatch.Restart();
@@ -133,8 +137,15 @@ public static class OverlayThread
             _device.SwapBuffers( _device.MainSwapchain );
 
             var wait = _targetFrameTime - stopwatch.Elapsed;
-            if ( wait.TotalSeconds > 0.0f )
+
+            if ( wait > TimeSpan.Zero )
+            {
+                if ( wait > maxWait )
+                    wait = maxWait;
+
                 Thread.Sleep( wait );
+            }
+
             delta = (float) stopwatch.Elapsed.TotalSeconds;
         }
 
