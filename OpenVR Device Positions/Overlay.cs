@@ -24,18 +24,6 @@ public class Overlay
 
     private VRManager _vrManager;
 
-    // i for input
-    private bool _iUseDeviceModels = true;
-    private bool _iCenterOnHMD = true;
-    private const int _iCountdownMin = 0;
-    private const int _iCountdownMax = 15;
-    private int _iCountdownSeconds = 5;
-
-    private bool _iSaveBaseStations = true;
-    private bool _iSaveHMD = true;
-    private bool _iSaveControllers = true;
-    private bool _iSaveTrackers = true;
-
     public Overlay( VRManager vrManager )
     {
         _vrManager = vrManager;
@@ -57,6 +45,18 @@ public class Overlay
 
     }
 
+
+    // i for input
+    private bool _iUseDeviceModels = true;
+    private bool _iCenterOnHMD = true;
+    private const int _iCountdownMin = 0;
+    private const int _iCountdownMax = 15;
+    private int _iCountdownSeconds = 5;
+
+    private bool _iSaveBaseStations = true;
+    private bool _iSaveHMD = true;
+    private bool _iSaveControllers = true;
+    private bool _iSaveTrackers = true;
 
     private bool _focusHelp = false;
     private string? _helpText = null;
@@ -218,8 +218,10 @@ public class Overlay
         _countdownState = null;
 
         Log.Text( "Saving..." );
-
         _iSaveDisabled = true;
+
+
+
         await Task.Delay( 750 );
         _iSaveDisabled = false;
     }
