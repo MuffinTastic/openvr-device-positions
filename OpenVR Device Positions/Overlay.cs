@@ -89,7 +89,10 @@ public class Overlay
         ImGui.SameLine( availableSpace.X - secretButtonSize.X );
         // Supplying no text breaks the slider below
         if ( ImGui.InvisibleButton( ":)", secretButtonSize ) ) Theme.Toggle();
-        
+
+        if ( _countdownState is not null )
+            ImGui.BeginDisabled();
+
         ImGui.Checkbox( "Use Device Models", ref _iUseDeviceModels );
         ImGui.SameLine(); HelpMarker( "Save to the FBX with actual VR device models instead of basic spheres" );
         ImGui.Checkbox( "Center on HMD", ref _iCenterOnHMD );
@@ -107,6 +110,9 @@ public class Overlay
         ImGui.Checkbox( "Controllers    ", ref _iSaveControllers );
         ImGui.SameLine( halfWidth );
         ImGui.Checkbox( "Trackers       ", ref _iSaveTrackers );
+
+        if ( _countdownState is not null )
+            ImGui.EndDisabled();
 
         ImGui.SeparatorText( "" );
 
@@ -224,5 +230,7 @@ public class Overlay
 
         await Task.Delay( 750 );
         _iSaveDisabled = false;
+
+        Log.Text( "Saved" );
     }
 }
