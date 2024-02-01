@@ -111,14 +111,14 @@ public static class OVRManager
             var position = matrix.GetPosition();
             var rotation = matrix.GetRotation();
 
-            Log.Text( $"    {deviceClass} - {pose.eTrackingResult}" );
-            Log.Text( $"      - Pos:{position}" );
-            Log.Text( $"      - Rot:{rotation}" );
+            Log.Text( $" -- {deviceClass} - {pose.eTrackingResult}" );
             if ( GetDeviceInfo( (uint) id, out DeviceInfo info ) )
             {
                 Log.Text( $"      - {info.HardwareModel}" );
                 Log.Text( $"      - {info.RenderModel}" );
             }
+            Log.Text( $"      - Pos:{position}" );
+            Log.Text( $"      - Rot:{rotation}" );
         }
 
 

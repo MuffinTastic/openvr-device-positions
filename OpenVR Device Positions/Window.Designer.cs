@@ -30,7 +30,6 @@ partial class Window
     {
         logBox = new ListBox();
         quitButton = new Button();
-        button2 = new Button();
         SuspendLayout();
         // 
         // logBox
@@ -40,34 +39,24 @@ partial class Window
         logBox.ItemHeight = 15;
         logBox.Location = new Point( 12, 12 );
         logBox.Name = "logBox";
-        logBox.Size = new Size( 260, 304 );
+        logBox.Size = new Size( 360, 199 );
         logBox.TabIndex = 0;
         // 
         // quitButton
         // 
-        quitButton.Location = new Point( 145, 326 );
+        quitButton.Location = new Point( 12, 217 );
         quitButton.Name = "quitButton";
-        quitButton.Size = new Size( 127, 23 );
+        quitButton.Size = new Size( 360, 32 );
         quitButton.TabIndex = 2;
         quitButton.Text = "Quit";
         quitButton.UseVisualStyleBackColor = true;
         quitButton.Click +=  quitButton_Click ;
         // 
-        // button2
-        // 
-        button2.Location = new Point( 12, 326 );
-        button2.Name = "button2";
-        button2.Size = new Size( 127, 23 );
-        button2.TabIndex = 1;
-        button2.Text = "button2";
-        button2.UseVisualStyleBackColor = true;
-        // 
         // Window
         // 
         AutoScaleDimensions = new SizeF( 7F, 15F );
         AutoScaleMode = AutoScaleMode.Font;
-        ClientSize = new Size( 284, 361 );
-        Controls.Add( button2 );
+        ClientSize = new Size( 384, 261 );
         Controls.Add( quitButton );
         Controls.Add( logBox );
         FormBorderStyle = FormBorderStyle.FixedSingle;
@@ -81,5 +70,4 @@ partial class Window
 
     private ListBox logBox;
     private Button quitButton;
-    private Button button2;
 }
