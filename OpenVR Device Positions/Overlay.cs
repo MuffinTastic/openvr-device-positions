@@ -13,7 +13,7 @@ namespace OVRDP;
 public class Overlay
 {
     public const int Width = 320;
-    public const int Height = 288;
+    public const int Height = 300;
 
     private const int HelpHeight = 96;
     private const int HelpOffset = 4;
@@ -23,14 +23,17 @@ public class Overlay
 
     private VRManager _vrManager;
 
-    private bool useDeviceModels = true;
-    private bool centerOnHMD = true;
-    private int countdownSeconds = 5;
+    // i for input
+    private bool _iUseDeviceModels = true;
+    private bool _iCenterOnHMD = true;
+    private const int _iCountdownMin = 0;
+    private const int _iCountdownMax = 15;
+    private int _iCountdownSeconds = 5;
 
-    private bool saveBaseStations = true;
-    private bool saveHMD = true;
-    private bool saveControllers = true;
-    private bool saveTrackers = true;
+    private bool _iSaveBaseStations = true;
+    private bool _iSaveHMD = true;
+    private bool _iSaveControllers = true;
+    private bool _iSaveTrackers = true;
 
     public Overlay( VRManager vrManager )
     {
@@ -53,8 +56,18 @@ public class Overlay
 
     }
 
+
     private bool _focusHelp = false;
     private string? _helpText = null;
+
+    private class CountdownState
+    {
+        required public int MaxSeconds { get; set; }
+        public int Current { get; set; } = 0;
+        public bool Cancelled { get; set; } = false;
+    }
+
+    private CountdownState? _countdownState = null;
 
     public void UpdateUI()
     {
@@ -69,34 +82,59 @@ public class Overlay
 
         ImGui.SeparatorText( "Settings" );
 
+        // Little easter egg
         var secretButtonSize = new Vector2( 20.0f );
-        ImGui.SameLine( availableSpace.X - secretButtonSize.X ); // little easter egg
+        ImGui.SameLine( availableSpace.X - secretButtonSize.X );
         // Supplying no text breaks the slider below
         if ( ImGui.InvisibleButton( ":)", secretButtonSize ) ) Theme.Toggle();
         
-        ImGui.Checkbox( "Use Device Models", ref useDeviceModels );
+        ImGui.Checkbox( "Use Device Models", ref _iUseDeviceModels );
         ImGui.SameLine(); HelpMarker( "Save to the FBX with actual VR device models instead of basic spheres" );
-        ImGui.Checkbox( "Center on HMD", ref centerOnHMD );
+        ImGui.Checkbox( "Center on HMD", ref _iCenterOnHMD );
         ImGui.SameLine(); HelpMarker( "Put the HMD at the origin of the FBX and reposition everything else relative to it" );
         ImGui.PushItemWidth( availableSpace.X );
-        string format = ( countdownSeconds > 0 ) ? "%ds" : "Off";
-        ImGui.SliderInt( "", ref countdownSeconds, 0, 10, $"Countdown: {format}" );
+        string format = ( _iCountdownSeconds > 0 ) ? "%ds" : "Off";
+        ImGui.SliderInt( "", ref _iCountdownSeconds, _iCountdownMin, _iCountdownMax, $"Countdown: {format}" );
         ImGui.PopItemWidth();
 
         ImGui.SeparatorText( "Devices" );
         // Extra spaces make it easier to click
-        ImGui.Checkbox( "Base Stations  ", ref saveBaseStations );
+        ImGui.Checkbox( "Base Stations  ", ref _iSaveBaseStations );
         ImGui.SameLine( halfWidth );
-        ImGui.Checkbox( "HMD            ", ref saveHMD );
-        ImGui.Checkbox( "Controllers    ", ref saveControllers );
+        ImGui.Checkbox( "HMD            ", ref _iSaveHMD );
+        ImGui.Checkbox( "Controllers    ", ref _iSaveControllers );
         ImGui.SameLine( halfWidth );
-        ImGui.Checkbox( "Trackers       ", ref saveTrackers );
+        ImGui.Checkbox( "Trackers       ", ref _iSaveTrackers );
 
         ImGui.SeparatorText( "" );
 
-        if ( ImGui.Button( "Save", ImGui.GetContentRegionAvail() ) )
+        if ( _countdownState is not null )
         {
-            Log.Text( "hehe" );
+            // Do this up here to avoid null refs
+            float frac = (float) _countdownState.Current / _countdownState.MaxSeconds;
+
+            if ( ImGui.Button( $"Abort ({_countdownState.Current})", ImGui.GetContentRegionAvail() ) )
+            {
+                _countdownState.Cancelled = true;
+                _countdownState = null;
+            }
+
+            var verticalPadding = ImGui.GetStyle().CellPadding.Y;
+            float barHeight = 6.0f;
+            ImGui.SetCursorPos( ImGui.GetCursorPos() - new Vector2( 0.0f, verticalPadding * 2 + barHeight ) );
+            ImGui.ProgressBar( frac, new Vector2( availableSpace.X, barHeight ), "" );
+        }
+        else
+        {
+            if ( ImGui.Button( "Save", ImGui.GetContentRegionAvail() ) )
+            {
+                _countdownState = new CountdownState
+                {
+                    MaxSeconds = _iCountdownSeconds
+                };
+
+                RunCountdown( _countdownState );
+            }
         }
 
         ImGui.End();
@@ -149,5 +187,29 @@ public class Overlay
 
 
         ImGui.PopStyleColor(6);
+    }
+
+    private async void RunCountdown( CountdownState state )
+    {
+        state.Current = state.MaxSeconds;
+
+        while ( state.Current > 0 )
+        {
+            await Task.Delay( 1000 );
+            
+            if ( state.Cancelled )
+            {
+                Log.Text( "Countdown cancelled" );
+                return;
+            }
+
+            state.Current--;
+
+        }
+
+        _countdownState = null;
+
+        Log.Text( "Saving..." );
+
     }
 }
