@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using static System.Net.Mime.MediaTypeNames;
@@ -68,6 +69,7 @@ public class Overlay
     }
 
     private CountdownState? _countdownState = null;
+    private bool _iSaveDisabled = false;
 
     public void UpdateUI()
     {
@@ -126,7 +128,10 @@ public class Overlay
         }
         else
         {
-            if ( ImGui.Button( "Save", ImGui.GetContentRegionAvail() ) )
+            if ( _iSaveDisabled )
+                ImGui.BeginDisabled();
+
+            if ( ImGui.Button( _iSaveDisabled ? "Saved" : "Save", ImGui.GetContentRegionAvail() ) )
             {
                 _countdownState = new CountdownState
                 {
@@ -135,6 +140,9 @@ public class Overlay
 
                 RunCountdown( _countdownState );
             }
+
+            if ( _iSaveDisabled )
+                ImGui.EndDisabled();
         }
 
         ImGui.End();
@@ -211,5 +219,8 @@ public class Overlay
 
         Log.Text( "Saving..." );
 
+        _iSaveDisabled = true;
+        await Task.Delay( 750 );
+        _iSaveDisabled = false;
     }
 }
