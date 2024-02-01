@@ -112,7 +112,7 @@ public static class OverlayUI
         ImGui.SetNextWindowPos( new Vector2( 0.0f, 0.0f ) );
         ImGui.SetNextWindowSize( new Vector2( OverlayConstants.RenderWidth, OverlayConstants.RenderHeight ) );
 
-        ImGui.Begin( "OpenVR Device Positions",
+        ImGui.Begin( OverlayConstants.ProgramNameReadable,
             ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoCollapse );
 
         var availableSpace = ImGui.GetContentRegionAvail();

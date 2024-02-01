@@ -20,6 +20,8 @@ public partial class Window : Form
 
         InitializeComponent();
 
+        Name = OverlayConstants.ProgramNameReadable;
+
         logBox.DrawMode = DrawMode.OwnerDrawVariable;
         logBox.MeasureItem += logBox_MeasureItem;
         logBox.DrawItem += logBox_DrawItem;

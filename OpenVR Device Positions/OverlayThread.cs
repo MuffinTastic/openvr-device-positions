@@ -84,7 +84,7 @@ public static class OverlayThread
         {
             var message = $"Overlay error: {ex.Message}";
             Log.Text( message );
-            MessageBox.Show( message, "OpenVR Device Positions", MessageBoxButtons.OK, MessageBoxIcon.Error );
+            MessageBox.Show( message, OverlayConstants.ProgramNameReadable, MessageBoxButtons.OK, MessageBoxIcon.Error );
         }
         finally
         {
@@ -109,7 +109,7 @@ public static class OverlayThread
 
         Log.Text( "Veldrid init" );
         VeldridStartup.CreateWindowAndGraphicsDevice(
-            new WindowCreateInfo( 100, 100, OverlayConstants.RenderWidth, OverlayConstants.RenderHeight, WindowState.Normal, "Overlay Test" ),
+            new WindowCreateInfo( 100, 100, OverlayConstants.RenderWidth, OverlayConstants.RenderHeight, WindowState.Normal, OverlayConstants.ProgramNameReadable ),
             new GraphicsDeviceOptions() { SyncToVerticalBlank = true },
             GraphicsBackend.Direct3D11,
             out _window, out _device );
@@ -124,7 +124,7 @@ public static class OverlayThread
         _ovrOverlay = OVRManager.CreateOverlay(
             _device.ResourceFactory,
             OverlayConstants.RenderWidth, OverlayConstants.RenderHeight,
-            "ovrdp-overlay", "ovrdp"
+            OverlayConstants.OverlayKeyName, OverlayConstants.ProgramNameInternal
         );
         if ( _ovrOverlay is null )
         {
