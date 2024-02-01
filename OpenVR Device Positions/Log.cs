@@ -3,10 +3,18 @@ using System.Runtime.CompilerServices;
 
 namespace OVRDP;
 
+/// <summary>
+/// Program-wide logger
+/// </summary>
 public static class Log
 {
     private static List<(bool, Action<string>)> LogSinks = new();
 
+    /// <summary>
+    /// Register a sink with the logger
+    /// </summary>
+    /// <param name="verbose">Print file name, line and caller function</param>
+    /// <param name="action">Log sink callback</param>
     public static void RegisterSink( bool verbose, Action<string> action )
     {
         if ( action is null )

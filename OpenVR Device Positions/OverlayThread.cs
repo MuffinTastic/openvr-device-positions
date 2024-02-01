@@ -13,6 +13,9 @@ using Veldrid.StartupUtilities;
 
 namespace OVRDP;
 
+/// <summary>
+/// Manages overlay thread and resources
+/// </summary>
 public static class OverlayThread
 {
     private static CancellationToken _ct;
@@ -25,7 +28,7 @@ public static class OverlayThread
     {
         _ct = ct;
 
-        _thread = new Thread( Threaded );
+        _thread = new Thread( Entry );
         _thread.Start();
 
         Log.Text( "Started overlay thread" );
@@ -63,7 +66,10 @@ public static class OverlayThread
 
     private static OVROverlayWrapper? _ovrOverlay = null;
 
-    private static void Threaded()
+    /// <summary>
+    /// Thread entry point
+    /// </summary>
+    private static void Entry()
     {
         Thread.Sleep( 750 );
 
@@ -88,8 +94,8 @@ public static class OverlayThread
 
     /// <summary>
     /// Initialize the overlay
-    /// A return value of false means the initialization was cancelled
     /// </summary>
+    /// <returns>Initialization was cancelled</returns>
     private static bool Init()
     {
         if ( !OVRManager.Init( _ct ) )
@@ -131,7 +137,10 @@ public static class OverlayThread
         return true;
     }
 
-    // Cancellable by main thread
+    /// <summary>
+    /// Main loop for the overlay
+    /// Cancellable by the main thread
+    /// </summary>
     private static void Loop()
     {
         var stopwatch = new Stopwatch();
@@ -171,6 +180,10 @@ public static class OverlayThread
         stopwatch.Stop();
     }
 
+    /// <summary>
+    /// Overlay resource cleanup
+    /// Always runs, even after exceptions
+    /// </summary>
     private static void Cleanup()
     {
         Log.Text( "Overlay cleanup" );

@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace OVRDP;
 
+/// <summary>
+/// Snapshot of the user's settings for saving FBXs
+/// </summary>
 public struct SaveSettings
 {
     required public bool UseDeviceModels;

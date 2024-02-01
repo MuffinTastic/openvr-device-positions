@@ -31,9 +31,12 @@ internal static class Program
         mainCTS.Cancel();
     }
 
-    // VR is a tad memory intensive. Despite this being C#
-    // we still want to keep it a little slim, so let's
-    // call GC every once in a while.
+
+    /// <summary>
+    /// Run a garbage collection loop in the background.
+    /// VR is a tad memory intensive, so despite this being
+    /// C# we still want to keep usage down.
+    /// </summary>
     async static void GCLoop( CancellationToken ct )
     {
         while ( !ct.IsCancellationRequested )

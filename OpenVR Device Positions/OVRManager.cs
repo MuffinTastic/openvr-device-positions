@@ -6,6 +6,9 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace OVRDP;
 
+/// <summary>
+/// Wrapper around OpenVR APIs
+/// </summary>
 public static class OVRManager
 {
     private static Dictionary<EVRInitError, string> InitErrorReasons = new Dictionary<EVRInitError, string>()
@@ -15,8 +18,8 @@ public static class OVRManager
 
     /// <summary>
     /// Initialize OpenVR
-    /// A return value of false means the initialization was cancelled
     /// </summary>
+    /// <returns>Initialization was cancelled</returns>
     public static bool Init( CancellationToken ct )
     {
         EVRInitError initError = EVRInitError.None;
@@ -49,12 +52,18 @@ public static class OVRManager
         return true;
     }
 
-    // Wrapper, keeps access consistent
+    /// <summary>
+    /// Wrapper around OpenVR.Shutdown() for consistency's sake
+    /// </summary>
     public static void Shutdown()
     {
         OpenVR.Shutdown();
     }
 
+    /// <summary>
+    /// Get the refresh rate of the HMD
+    /// </summary>
+    /// <returns></returns>
     public static float GetRefreshRate()
     {
         ETrackedPropertyError error = default;
@@ -71,6 +80,9 @@ public static class OVRManager
         return rate;
     }
 
+    /// <summary>
+    /// Create an OpenVR overlay instance
+    /// </summary>
     public static OVROverlayWrapper? CreateOverlay( ResourceFactory resourceFactory, int width, int height, string key, string name )
     {
         ulong handle = 0;
@@ -84,6 +96,9 @@ public static class OVRManager
         return new OVROverlayWrapper( handle, resourceFactory, width, height );
     }
 
+    /// <summary>
+    /// Save the positions of all the desired devices to an FBX. The star of the show
+    /// </summary>
     public static void SavePositions( SaveSettings saveSettings )
     {
         HashSet<ETrackedDeviceClass> desiredClasses = GetDesiredClasses( saveSettings );

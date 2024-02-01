@@ -12,6 +12,9 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace OVRDP;
 
+/// <summary>
+/// Handles logic for VR overlay positioning and ImGui
+/// </summary>
 public static class OverlayUI
 {
     private const int ICountdownMin = 0;
@@ -60,11 +63,17 @@ public static class OverlayUI
         Log.Text( "Closed overlay" );
     }
 
+    /// <summary>
+    /// Updates the position and rotation of the overlay
+    /// </summary>
     public static void UpdateTransform()
     {
 
     }
 
+    /// <summary>
+    /// Submits the position and rotation to OpenVR
+    /// </summary>
     private static void SubmitTransform()
     {
 
@@ -95,6 +104,9 @@ public static class OverlayUI
     private static CountdownState? _saveCountdownState = null;
     private static bool _iSaveDisabled = false;
 
+    /// <summary>
+    /// Update ImGui UI
+    /// </summary>
     public static void UpdateUI()
     {
         ImGui.SetNextWindowPos( new Vector2( 0.0f, 0.0f ) );
@@ -202,24 +214,13 @@ public static class OverlayUI
 
         if ( _helpText is not null )
         {
-            var childBg = ImGui.GetStyle().Colors[(int) ImGuiCol.ChildBg];
-
-            ImGui.PushStyleColor( ImGuiCol.WindowBg, childBg );
-            ImGui.SetNextWindowPos( new Vector2( HelpOffset, OverlayConstants.RenderHeight - HelpOffset - HelpHeight ) );
-            ImGui.SetNextWindowSize( new Vector2( OverlayConstants.RenderWidth - HelpOffset * 2, HelpHeight ) );
-            ImGui.Begin( "Help",
-                ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoCollapse );
-
-            ImGui.TextWrapped( _helpText );
-
-            if ( !ImGui.IsWindowAppearing() && !ImGui.IsWindowFocused() )
-                _helpText = null;
-
-            ImGui.End();
-            ImGui.PopStyleColor();
+            ShowHelpWindow();
         }
     }
 
+    /// <summary>
+    /// Help marker widget, click to show help window
+    /// </summary>
     private static void HelpMarker( string helpText )
     {
         ImGui.SetCursorPos( ImGui.GetCursorPos() + new Vector2( 10.0f, 0.0f ) );
@@ -227,9 +228,9 @@ public static class OverlayUI
         ImGui.PushStyleColor( ImGuiCol.Border, new Vector4( 0.0f ) );
         ImGui.PushStyleColor( ImGuiCol.BorderShadow, new Vector4( 0.0f ) );
         ImGui.PushStyleColor( ImGuiCol.Button, new Vector4( 0.0f ) );
-        ImGui.PushStyleColor( ImGuiCol.Text, Theme.HelpMarkerText );
-        ImGui.PushStyleColor( ImGuiCol.ButtonHovered, Theme.HelpMarkerHover );
-        ImGui.PushStyleColor( ImGuiCol.ButtonActive, Theme.HelpMarkerHover );
+        ImGui.PushStyleColor( ImGuiCol.Text, Theme.HelpMarkerTextColor );
+        ImGui.PushStyleColor( ImGuiCol.ButtonHovered, Theme.HelpMarkerHoverColor );
+        ImGui.PushStyleColor( ImGuiCol.ButtonActive, Theme.HelpMarkerHoverColor );
 
         // You can't select the second marker if you
         // call Button() normally here... Hate.
@@ -243,6 +244,30 @@ public static class OverlayUI
         ImGui.PopStyleColor(6);
     }
 
+    private static void ShowHelpWindow()
+    {
+        var childBg = ImGui.GetStyle().Colors[(int) ImGuiCol.ChildBg];
+
+        ImGui.PushStyleColor( ImGuiCol.WindowBg, childBg );
+        ImGui.SetNextWindowPos( new Vector2( HelpOffset, OverlayConstants.RenderHeight - HelpOffset - HelpHeight ) );
+        ImGui.SetNextWindowSize( new Vector2( OverlayConstants.RenderWidth - HelpOffset * 2, HelpHeight ) );
+        ImGui.Begin( "Help",
+            ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoCollapse );
+
+        ImGui.TextWrapped( _helpText );
+
+        if ( !ImGui.IsWindowAppearing() && !ImGui.IsWindowFocused() )
+            _helpText = null;
+
+        ImGui.End();
+        ImGui.PopStyleColor();
+    }
+
+    /// <summary>
+    /// Run a countdown asynchronously. 
+    /// </summary>
+    /// <param name="state">The state to run with. Max seconds of 0 makes it 'finish' instantly.</param>
+    /// <param name="saveSettings">The user's save settings at countdown start</param>
     private static async void RunSaveCountdown( CountdownState state, SaveSettings saveSettings )
     {
         state.Current = state.MaxSeconds;
