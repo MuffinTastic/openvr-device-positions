@@ -11,7 +11,7 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace OVRDP;
 
-public class Overlay
+public class OverlayUI
 {
     public const int Width = 320;
     public const int Height = 300;
@@ -24,7 +24,7 @@ public class Overlay
 
     private VRManager _vrManager;
 
-    public Overlay( VRManager vrManager )
+    public OverlayUI( VRManager vrManager )
     {
         _vrManager = vrManager;
 

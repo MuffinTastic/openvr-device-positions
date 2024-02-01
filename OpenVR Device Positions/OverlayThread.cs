@@ -57,7 +57,7 @@ public static class OverlayThread
     private static ImGuiRenderer renderer;
     private static CommandList commandList;
 
-    private static Overlay _overlay;
+    private static OverlayUI _overlay;
 
     private static void Threaded()
     {
@@ -81,7 +81,7 @@ public static class OverlayThread
 
         Log.Text( "Veldrid init" );
         VeldridStartup.CreateWindowAndGraphicsDevice(
-            new WindowCreateInfo( 100, 100, 1280, 720, Veldrid.WindowState.Normal, "test" ),
+            new WindowCreateInfo( 100, 100, OverlayUI.Width, OverlayUI.Height, WindowState.Normal, "Overlay Test" ),
             new GraphicsDeviceOptions() { SyncToVerticalBlank = true },
             GraphicsBackend.Direct3D11,
             out window, out device );
@@ -94,7 +94,7 @@ public static class OverlayThread
         commandList = device.ResourceFactory.CreateCommandList();
 
         Theme.SetDefault();
-        _overlay = new Overlay( _vrManager );
+        _overlay = new OverlayUI( _vrManager );
 
         Log.Text( "Overlay opened" );
     }
@@ -107,8 +107,6 @@ public static class OverlayThread
             var input = window.PumpEvents();
             if ( !window.Exists ) { break; }
             renderer.Update( 1f / 60f, input ); // Compute actual value for deltaSeconds.
-
-            ImGui.ShowDemoWindow();
 
             _overlay.UpdateUI();
 
