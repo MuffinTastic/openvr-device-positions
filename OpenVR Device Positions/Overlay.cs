@@ -82,7 +82,11 @@ public class Overlay
         var availableSpace = ImGui.GetContentRegionAvail();
         float halfWidth = availableSpace.X / 2.0f;
 
+        if ( _saveCountdownState is not null )
+            ImGui.BeginDisabled();
         ImGui.SeparatorText( "Settings" );
+        if ( _saveCountdownState is not null )
+            ImGui.EndDisabled();
 
         // Little easter egg
         var secretButtonSize = new Vector2( 20.0f );
@@ -223,7 +227,6 @@ public class Overlay
             
             if ( state.Cancelled )
             {
-                Log.Text( "Countdown cancelled" );
                 return;
             }
 
