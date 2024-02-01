@@ -3,6 +3,9 @@ using System.Threading.Channels;
 
 namespace OVRDP;
 
+/// <summary>
+/// WinForms window with a thread-safe log box
+/// </summary>
 public partial class Window : Form
 {
     private const int c_MaxLogItems = 100;
