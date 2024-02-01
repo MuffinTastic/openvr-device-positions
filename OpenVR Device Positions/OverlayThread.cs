@@ -51,14 +51,13 @@ public static class OverlayThread
 
     private static VRManager? _vrManager = null;
 
-    private const int c_Width = 512;
-    private const int c_Height = 512;
-
     private static int frameCap = 60;
     private static Sdl2Window window;
     private static GraphicsDevice device;
     private static ImGuiRenderer renderer;
     private static CommandList commandList;
+
+    private static Overlay _overlay;
 
     private static void Threaded()
     {
@@ -80,14 +79,24 @@ public static class OverlayThread
         //     Environment.Exit( 1 );
         // }
 
+        Log.Text( "Veldrid init" );
         VeldridStartup.CreateWindowAndGraphicsDevice(
-            new WindowCreateInfo( 100, 100, c_Width, c_Height, Veldrid.WindowState.Normal, "test" ),
+            new WindowCreateInfo( 100, 100, 1280, 720, Veldrid.WindowState.Normal, "test" ),
+            new GraphicsDeviceOptions() { SyncToVerticalBlank = true },
+            GraphicsBackend.Direct3D11,
             out window, out device );
+
+        Log.Text( $"Backend: {device.BackendType}" );
 
         renderer = new ImGuiRenderer( device, device.MainSwapchain.Framebuffer.OutputDescription,
             (int) device.MainSwapchain.Framebuffer.Width, (int) device.MainSwapchain.Framebuffer.Height );
 
         commandList = device.ResourceFactory.CreateCommandList();
+
+        Theme.SetDefault();
+        _overlay = new Overlay( _vrManager! );
+
+        Log.Text( "Overlay opened" );
     }
 
     // Cancellable by main thread
@@ -99,12 +108,9 @@ public static class OverlayThread
             if ( !window.Exists ) { break; }
             renderer.Update( 1f / 60f, input ); // Compute actual value for deltaSeconds.
 
-            // Draw stuff
-            ImGui.Text( "Hello World" );
-            if ( ImGui.Button( "Test" ) )
-            {
-                Log.Text( "you pressed the button" );
-            }
+            ImGui.ShowDemoWindow();
+
+            _overlay.UpdateUI();
 
             commandList.Begin();
             commandList.SetFramebuffer( device.MainSwapchain.Framebuffer );
@@ -118,7 +124,8 @@ public static class OverlayThread
 
     private static void Cleanup()
     {
-        Log.Text( "Thread cleanup" );
+        Log.Text( "Overlay cleanup" );
+        _overlay.Close();
     }
 
     #endregion
