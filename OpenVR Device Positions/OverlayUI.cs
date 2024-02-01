@@ -74,6 +74,7 @@ public static class OverlayUI
     // i for input
     private static bool _iUseDeviceModels = true;
     private static bool _iCenterOnHMD = true;
+    private static bool _iSaveInvalidPoses = true;
     private static int _iCountdownSeconds = 5;
 
     private static bool _iSaveBaseStations = true;
@@ -124,6 +125,8 @@ public static class OverlayUI
         ImGui.SameLine(); HelpMarker( "Save to the FBX with actual VR device models instead of basic spheres" );
         ImGui.Checkbox( "Center on HMD", ref _iCenterOnHMD );
         ImGui.SameLine(); HelpMarker( "Put the HMD at the origin of the FBX and reposition everything else relative to it" );
+        ImGui.Checkbox( "Save Invalid Poses", ref _iSaveInvalidPoses );
+        ImGui.SameLine(); HelpMarker( "Save devices to the FBX even if they've lost tracking" );
         ImGui.PushItemWidth( availableSpace.X );
         string format = ( _iCountdownSeconds > 0 ) ? "%ds" : "Off";
         ImGui.SliderInt( "", ref _iCountdownSeconds, ICountdownMin, ICountdownMax, $"Countdown: {format}" );
@@ -175,6 +178,7 @@ public static class OverlayUI
                 {
                     UseDeviceModels = _iUseDeviceModels,
                     CenterOnHMD = _iCenterOnHMD,
+                    SaveInvalidPoses = _iSaveInvalidPoses,
                     SaveBaseStations = _iSaveBaseStations,
                     SaveHMD = _iSaveHMD,
                     SaveControllers = _iSaveControllers,
@@ -243,12 +247,17 @@ public static class OverlayUI
     {
         state.Current = state.MaxSeconds;
 
+        if ( state.Current != 0 )
+            Log.Text( "Starting countdown" );
+
         while ( state.Current > 0 )
         {
+            Log.Text( $"{state.Current}..." );
             await Task.Delay( 1000 );
             
             if ( state.Cancelled )
             {
+                Log.Text( "Countdown cancelled" );
                 return;
             }
 

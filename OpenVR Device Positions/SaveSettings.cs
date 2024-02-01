@@ -10,6 +10,7 @@ public struct SaveSettings
 {
     required public bool UseDeviceModels;
     required public bool CenterOnHMD;
+    required public bool SaveInvalidPoses;
     required public bool SaveBaseStations;
     required public bool SaveHMD;
     required public bool SaveControllers;
