@@ -8,7 +8,7 @@ namespace OVRDP;
 
 public static class MeshStore
 {
-    private const string DefaultDeviceMeshFile = "DefaultDeviceMesh.obj";
+    private const string DefaultDeviceMeshFile = "DefaultDeviceMeshXYZ.obj";
 
     private static Mesh? _defaultDeviceMesh = null;
 

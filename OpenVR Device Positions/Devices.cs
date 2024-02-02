@@ -17,20 +17,45 @@ public static class Devices
     public static void SavePositions( SaveSettings saveSettings )
     {
         var fbxScene = new Scene();
+        fbxScene.AssetInfo.ApplicationName = OverlayConstants.ProgramNameReadable;
+        //fbxScene.AssetInfo.AxisSystem = new AxisSystem( CoordinateSystem.RightHanded, Axis.YAxis, Axis.NegativeZAxis );
+
         var deviceRoot = fbxScene.RootNode.CreateChildNode( "VR Devices" );
 
         HashSet<ETrackedDeviceClass> desiredClasses = GetDesiredClasses( saveSettings );
 
-        Log.Text( $"Saving devices:" );
+        // Transform device position and rotation relative to
+        // HMD on the XZ plane
 
         var trackedDevicePoses = new TrackedDevicePose_t[OpenVR.k_unMaxTrackedDeviceCount];
         OpenVR.System.GetDeviceToAbsoluteTrackingPose( ETrackingUniverseOrigin.TrackingUniverseStanding, 0.0f, trackedDevicePoses );
 
+        // Let's assume it's being tracked...
         var hmdPose = trackedDevicePoses[OpenVR.k_unTrackedDeviceIndex_Hmd];
-        var hmdMatrix = hmdPose.mDeviceToAbsoluteTracking; // Let's assume it's being tracked...
-        var hmdPositionXZ = hmdMatrix.GetPosition() * new Vector3( 1.0f, 0.0f, 1.0f );
-        var hmdRotationYEuler = hmdMatrix.GetRotation().ToEuler() * new Vector3( 0.0f, 1.0f, 0.0f );
-        var hmdRotationYInverse = Quaternion.Inverse( hmdRotationYEuler.FromEuler() );
+        var hmdMatrix34 = hmdPose.mDeviceToAbsoluteTracking;
+
+        Vector3 hmdPositionXZ = hmdMatrix34.GetPosition() * new Vector3( 1.0f, 0.0f, 1.0f );
+        Log.Text( $"{hmdPositionXZ}" );
+        Vector3 hmdRotationYEuler = hmdMatrix34.GetRotation().ToEuler() * new Vector3( 0.0f, 1.0f, 0.0f );
+        Quaternion hmdRotationY = hmdRotationYEuler.FromEuler();
+
+        Matrix4x4.Invert( Matrix4x4.CreateTranslation( hmdPositionXZ ), out Matrix4x4 hmdTranslateInvert );
+        Matrix4x4 hmdRotationInvert = Matrix4x4.CreateFromQuaternion( hmdRotationY );
+
+        var centerOnHMDMatrix = hmdTranslateInvert * hmdRotationInvert;
+
+
+        Matrix4x4 spaceReorient180Yaw = Matrix4x4.CreateFromAxisAngle( new Vector3( 0.0f, 1.0f, 0.0f ), MathHelper.ToRadians( 180.0f ) );
+
+
+        Matrix4x4 spaceMatrix;
+        if ( saveSettings.CenterOnHMD )
+            spaceMatrix = centerOnHMDMatrix;
+        else
+            spaceMatrix = spaceReorient180Yaw;
+
+
+        Log.Text( $"Saving devices:" );
 
         for ( int id = 0; id < OpenVR.k_unMaxTrackedDeviceCount; id++ )
         {
@@ -45,18 +70,15 @@ public static class Devices
             if ( !pose.bPoseIsValid && !saveSettings.SaveInvalidPoses )
                 continue;
 
-            var matrix = pose.mDeviceToAbsoluteTracking;
-            var position = matrix.GetPosition();
-            var rotation = matrix.GetRotation();
 
-            // Transform device position and rotation relative to
-            // HMD on the XZ plane
-            if ( saveSettings.CenterOnHMD )
-            {
-                position -= hmdPositionXZ;
-                position = Vector3.Transform(position, hmdRotationYInverse );
-                rotation = hmdRotationYInverse * rotation;
-            }
+            Matrix4x4 matrix;
+            if ( id == OpenVR.k_unTrackedDeviceIndex_Hmd )
+                matrix = hmdMatrix34.GetMatrix4x4();
+            else
+                matrix = pose.mDeviceToAbsoluteTracking.GetMatrix4x4();
+
+            matrix = matrix * spaceMatrix;
+
 
             string? renderModel = null;
 
@@ -70,13 +92,11 @@ public static class Devices
                     renderModel = info.RenderModel;
                 }
             }
-            Log.Text( $"      - Pos:{position}" );
-            Log.Text( $"      - Rot:{rotation}" );
+
 
             var deviceNode = deviceRoot.CreateChildNode( $"{deviceClass}.{id}" );
             deviceNode.Entity = MeshStore.GetRenderModel( renderModel );
-            deviceNode.Transform.Translation = new AsposeVector3( position.X, position.Y, position.Z );
-            deviceNode.Transform.Rotation = new AsposeQuaternion( rotation.W, rotation.X, rotation.Y, rotation.Z );
+            deviceNode.Transform.TransformMatrix = matrix.ToAspose();
 
             Log.Text( $"Added node {deviceNode.Name}" );
         }
