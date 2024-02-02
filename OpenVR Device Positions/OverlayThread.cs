@@ -5,9 +5,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Channels;
 using System.Threading.Tasks;
+using Valve.VR;
 using Veldrid;
 using Veldrid.Sdl2;
 using Veldrid.StartupUtilities;
@@ -153,6 +155,8 @@ public static class OverlayThread
             throw new OverlayFatalException( "Couldn't create OpenVR overlay" );
         }
 
+        _ovrOverlay.SetInputMethod( VROverlayInputMethod.Mouse );
+        _ovrOverlay.SetInputRemapping( new Vector2( OverlayConstants.RenderWidth, OverlayConstants.RenderHeight ) );
 
         _uiRenderer = new ImGuiRenderer( _device, _frameBuffer.OutputDescription,
             (int) _frameBuffer.Width, (int) _frameBuffer.Height );
@@ -182,7 +186,10 @@ public static class OverlayThread
             stopwatch.Restart();
             // var input = _window.PumpEvents();
             // if ( !_window.Exists ) { break; }
-            _uiRenderer.Update( delta, new OverlayInputSnapshot() );
+            var snapshot = _ovrOverlay!.PollEvents();
+            _uiRenderer.Update( delta, snapshot );
+
+            OverlayUI.UpdateTransform();
 
             OverlayUI.UpdateUI();
 

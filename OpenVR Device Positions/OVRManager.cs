@@ -32,7 +32,7 @@ public static class OVRManager
     public static bool Init( CancellationToken ct )
     {
         EVRInitError initError = EVRInitError.None;
-        OpenVR.Init( ref initError, EVRApplicationType.VRApplication_Background );
+        OpenVR.Init( ref initError, EVRApplicationType.VRApplication_Overlay );
 
         if ( initError == EVRInitError.Init_NoServerForBackgroundApp )
         {

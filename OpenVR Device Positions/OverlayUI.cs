@@ -1,6 +1,7 @@
 ﻿using ImGuiNET;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Numerics;
@@ -8,6 +9,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Valve.VR;
+using Vortice.Mathematics;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace OVRDP;
@@ -29,23 +31,17 @@ public static class OverlayUI
 
     private static OVROverlayWrapper? _ovrOverlay = null;
 
+    private static Stopwatch _openedTime = new Stopwatch();
+
     public static bool Open( OVROverlayWrapper ovrOverlay )
     {
         _ovrOverlay = ovrOverlay;
 
         _ovrOverlay.SetWidthInMeters( OverlayConstants.VRWidth );
-        _ovrOverlay.SetColor( new Vector3( 1.0f ) );
-
-        VRTextureBounds_t bounds = new()
-        {
-            uMin = 0,
-            uMax = 1,
-            vMin = 0,
-            vMax = 1
-        };
-        _ovrOverlay.SetTextureBounds( bounds );
 
         _ovrOverlay.Show();
+
+        _openedTime.Start();
 
         return true;
     }
@@ -55,20 +51,19 @@ public static class OverlayUI
         _ovrOverlay?.Hide();
     }
 
+    private static float blag = 0.0f;
+
     /// <summary>
     /// Updates the position and rotation of the overlay
     /// </summary>
     public static void UpdateTransform()
     {
+        blag = (float) _openedTime.Elapsed.TotalSeconds;
 
-    }
+        _position = new Vector3( 0.0f, 1.5f, -1.5f );
+        _rotation = Quaternion.Identity; // Quaternion.CreateFromAxisAngle( Vector3.UnitY, MathHelper.ToRadians( 180.0f ) );
 
-    /// <summary>
-    /// Submits the position and rotation to OpenVR
-    /// </summary>
-    private static void SubmitTransform()
-    {
-
+        _ovrOverlay!.SetTransform( _position, _rotation );
     }
 
 

@@ -6,7 +6,21 @@ namespace OVRDP;
 // Adapted from openvr_api.cs 
 public static class HmdMatrix34_tExtensions
 {
-    public static Vector3 GetPosition( this HmdMatrix34_t m )
+    public static HmdMatrix34_t FromVectorAndQuat( Vector3 v, Quaternion q )
+    {
+        Matrix4x4 r = Matrix4x4.CreateFromQuaternion( q );
+        
+        HmdMatrix34_t h = new HmdMatrix34_t
+        {
+            m0 = r.M11, m1 = r.M12, m2 = r.M13,  m3 = v.X,
+            m4 = r.M21, m5 = r.M22, m6 = r.M23,  m7 = v.Y,
+            m8 = r.M31, m9 = r.M32, m10 = r.M33, m11 = v.Z
+        };
+
+        return h;
+    }
+
+public static Vector3 GetPosition( this HmdMatrix34_t m )
     {
         return new Vector3( m.m3, m.m7, m.m11 );
     }
