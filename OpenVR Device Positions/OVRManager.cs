@@ -133,12 +133,6 @@ public static class OVRManager
             {
                 Log.Text( $"      - {info.HardwareModel}" );
                 Log.Text( $"      - {info.RenderModel}" );
-
-                var test = GetRenderModel( info.RenderModel );
-                if ( test is OVRRenderModel model )
-                {
-                    Log.Text( $"      - Render model vertex count: {model.TriangleCount}" );
-                }
             }
             Log.Text( $"      - Pos:{position}" );
             Log.Text( $"      - Rot:{rotation}" );
@@ -236,7 +230,10 @@ public static class OVRManager
         }
 
         if ( error != EVRRenderModelError.None )
+        {
+            Log.Text( $"Error getting render model for {modelName}: {error}" );
             return null;
+        }
 
         var model = new OVRRenderModel( handle );
 

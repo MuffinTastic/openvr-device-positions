@@ -12,19 +12,21 @@ public struct OVRRenderModel
 {
     private bool _disposedValue;
 
+    public uint TriangleCount;
+    public uint VertexCount;
     public RenderModel_Vertex_t[] Vertices;
     public ushort[] Indices;
-    public uint TriangleCount;
 
     public OVRRenderModel( nint handle )
     {
         RenderModel_t renderModelStruct = Marshal.PtrToStructure<RenderModel_t>( handle );
         TriangleCount = renderModelStruct.unTriangleCount;
-        
-        Vertices = new RenderModel_Vertex_t[renderModelStruct.unVertexCount];
+
+        VertexCount = renderModelStruct.unVertexCount;
+        Vertices = new RenderModel_Vertex_t[VertexCount];
 
         var vertexSize = Marshal.SizeOf<RenderModel_Vertex_t>();
-        for ( int i = 0; i < renderModelStruct.unVertexCount; i++ )
+        for ( int i = 0; i < VertexCount; i++ )
         {
             var ptr = renderModelStruct.rVertexData + ( i * vertexSize );
             Vertices[i] = Marshal.PtrToStructure<RenderModel_Vertex_t>( ptr );
