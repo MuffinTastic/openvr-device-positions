@@ -18,6 +18,9 @@ internal static class Program
         Log.RegisterSink( verbose: true, ( text ) => Debug.Write( $"{text}\n" ) );
 
         Log.Text( "Starting OVRDP" );
+
+        Util.EnsureOutputDirectoryExists();
+
         OverlayThread.Start( overlayCTS.Token );
         
         ApplicationConfiguration.Initialize();
