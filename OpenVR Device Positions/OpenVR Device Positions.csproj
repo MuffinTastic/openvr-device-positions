@@ -7,21 +7,23 @@
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="copy &quot;$(SolutionDir)openvr\bin\win64\openvr_api.dll*&quot; &quot;$(ProjectDir)$(OutDir)&quot; /Y" />
-  </Target>
-
-  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="copy &quot;$(SolutionDir)openvr\headers\openvr_api.cs&quot; &quot;$(ProjectDir)\External&quot;" />
-  </Target>
-
   <ItemGroup>
+    <PackageReference Include="Aspose.3D" Version="24.1.0" />
     <PackageReference Include="ImGui.NET" Version="1.89.7.1" />
     <PackageReference Include="Veldrid" Version="4.9.0" />
     <PackageReference Include="Veldrid.ImGui" Version="5.72.0" />
     <PackageReference Include="Veldrid.StartupUtilities" Version="4.9.0" />
   </ItemGroup>
+
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="copy &quot;$(SolutionDir)openvr\headers\openvr_api.cs&quot; &quot;$(ProjectDir)External&quot;&#xD;&#xA;" />
+  </Target>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="copy &quot;$(SolutionDir)openvr\bin\win64\openvr_api.dll&quot; &quot;$(ProjectDir)$(OutDir)&quot; /Y&#xD;&#xA;mkdir &quot;$(ProjectDir)$(OutDir)Assets&quot;&#xD;&#xA;copy &quot;$(ProjectDir)Assets&quot; &quot;$(ProjectDir)$(OutDir)Assets&quot;" />
+  </Target>
 
 </Project>
