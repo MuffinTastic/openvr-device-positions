@@ -1,4 +1,5 @@
-﻿using ImGuiNET;
+﻿using Aspose.ThreeD.Render;
+using ImGuiNET;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -59,10 +60,14 @@ public static class OverlayThread
     private static float _frameCap = 90.0f;
     private static float _targetFrameTimeFloat = 1.0f / _frameCap;
     private static TimeSpan _targetFrameTime = default;
-    private static Sdl2Window _window;
+
     private static GraphicsDevice _device;
-    private static ImGuiRenderer _renderer;
+    private static Texture _renderTarget;
+    private static Framebuffer _frameBuffer;
+    private static Pipeline _pipeLine;
     private static CommandList _commandList;
+
+    private static ImGuiRenderer _uiRenderer;
 
     private static OVROverlayWrapper? _ovrOverlay = null;
 
@@ -107,32 +112,60 @@ public static class OverlayThread
         _targetFrameTimeFloat = 1.0f / _frameCap;
         _targetFrameTime = TimeSpan.FromSeconds( _targetFrameTimeFloat );
 
-        Log.Text( "Veldrid init" );
-        VeldridStartup.CreateWindowAndGraphicsDevice(
-            new WindowCreateInfo( 100, 100, OverlayConstants.RenderWidth, OverlayConstants.RenderHeight, WindowState.Normal, OverlayConstants.ProgramNameReadable ),
-            new GraphicsDeviceOptions() { SyncToVerticalBlank = true },
-            GraphicsBackend.Direct3D11,
-            out _window, out _device );
 
-        _renderer = new ImGuiRenderer( _device, _device.MainSwapchain.Framebuffer.OutputDescription,
-            (int) _device.MainSwapchain.Framebuffer.Width, (int) _device.MainSwapchain.Framebuffer.Height );
+        //VeldridStartup.CreateWindowAndGraphicsDevice(
+        //    new WindowCreateInfo( 100, 100, OverlayConstants.RenderWidth, OverlayConstants.RenderHeight, WindowState.Normal, OverlayConstants.ProgramNameReadable ),
+        //    new GraphicsDeviceOptions() { SyncToVerticalBlank = true },
+        //    GraphicsBackend.Direct3D11,
+        //    out _window, out _device );
 
-        _commandList = _device.ResourceFactory.CreateCommandList();
+        _device = GraphicsDevice.CreateD3D11( new GraphicsDeviceOptions()
+        {
+            HasMainSwapchain = false,
+            PreferStandardClipSpaceYDirection = true,
+            PreferDepthRangeZeroToOne = true
+        } );
 
-        Theme.SetDefault();
+        ResourceFactory factory = _device.ResourceFactory;
+
+        _renderTarget = factory.CreateTexture(
+            TextureDescription.Texture2D(
+                OverlayConstants.RenderWidth, OverlayConstants.RenderHeight,
+                1,
+                1,
+                Veldrid.PixelFormat.R8_G8_B8_A8_UNorm,
+                TextureUsage.RenderTarget
+            )
+        );
+
+        _frameBuffer = factory.CreateFramebuffer( new FramebufferDescription( null, _renderTarget ) );
+
+        _commandList = factory.CreateCommandList();
+
+        Log.Text( "Graphics started" );
+
 
         _ovrOverlay = OVRManager.CreateOverlay(
-            _device.ResourceFactory,
+            factory,
             OverlayConstants.RenderWidth, OverlayConstants.RenderHeight,
             OverlayConstants.OverlayKeyName, OverlayConstants.ProgramNameInternal
         );
         if ( _ovrOverlay is null )
         {
-            OVRManager.Shutdown();
-            Environment.Exit( 1 );
+            throw new OverlayFatalException( "Couldn't create OpenVR overlay" );
         }
 
+
+        _uiRenderer = new ImGuiRenderer( _device, _frameBuffer.OutputDescription,
+            (int) _frameBuffer.Width, (int) _frameBuffer.Height );
+
+        Theme.SetDefault();
+
+
         OverlayUI.Open( _ovrOverlay );
+
+        Log.Text( "Opened overlay" );
+
 
         return true;
     }
@@ -149,19 +182,22 @@ public static class OverlayThread
         while ( !_ct.IsCancellationRequested )
         {
             stopwatch.Restart();
-            var input = _window.PumpEvents();
-            if ( !_window.Exists ) { break; }
-            _renderer.Update( delta, input );
+            // var input = _window.PumpEvents();
+            // if ( !_window.Exists ) { break; }
+            _uiRenderer.Update( delta, new OverlayInputSnapshot() );
 
             OverlayUI.UpdateUI();
 
             _commandList.Begin();
-            _commandList.SetFramebuffer( _device.MainSwapchain.Framebuffer );
+            _commandList.SetFramebuffer( _frameBuffer );
             _commandList.ClearColorTarget( 0, RgbaFloat.Black );
-            _renderer.Render( _device, _commandList );
+            
+            _uiRenderer.Render( _device, _commandList );
+
+            _ovrOverlay!.SubmitFrame( _device, _commandList, _renderTarget );
+
             _commandList.End();
             _device.SubmitCommands( _commandList );
-            _device.SwapBuffers( _device.MainSwapchain );
 
             var wait = _targetFrameTime - stopwatch.Elapsed;
             int waitMS = wait.Milliseconds;
@@ -186,8 +222,18 @@ public static class OverlayThread
     /// </summary>
     private static void Cleanup()
     {
-        Log.Text( "Overlay cleanup" );
         OverlayUI.Close();
+
+        _ovrOverlay?.Dispose();
+
+        _commandList?.Dispose();
+        _frameBuffer?.Dispose();
+        _renderTarget?.Dispose();
+        _device?.Dispose();
+
+        OVRManager.Shutdown();
+
+        Log.Text( "Closed overlay" );
     }
 
     #endregion

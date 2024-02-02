@@ -23,6 +23,8 @@ public static class OVRManager
         
     };
 
+    private static bool _initialized = false;
+
     /// <summary>
     /// Initialize OpenVR
     /// </summary>
@@ -56,6 +58,7 @@ public static class OVRManager
 
         Log.Text( "Connected to VR" );
 
+        _initialized = true;
         return true;
     }
 
@@ -64,7 +67,11 @@ public static class OVRManager
     /// </summary>
     public static void Shutdown()
     {
-        OpenVR.Shutdown();
+        if ( _initialized )
+        {
+            OpenVR.Shutdown();
+            _initialized = false;
+        }
     }
 
     /// <summary>

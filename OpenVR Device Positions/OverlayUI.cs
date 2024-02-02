@@ -47,20 +47,12 @@ public static class OverlayUI
 
         _ovrOverlay.Show();
 
-        Log.Text( "Created overlay" );
-
         return true;
     }
 
     public static void Close()
     {
-        if ( _ovrOverlay is null )
-            return;
-
-        _ovrOverlay.Hide();
-        _ovrOverlay.Close();
-
-        Log.Text( "Closed overlay" );
+        _ovrOverlay?.Hide();
     }
 
     /// <summary>
