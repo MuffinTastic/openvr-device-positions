@@ -10,8 +10,6 @@ namespace OVRDP;
 
 public struct OVRRenderModel
 {
-    private bool _disposedValue;
-
     public uint TriangleCount;
     public uint VertexCount;
     public RenderModel_Vertex_t[] Vertices;
