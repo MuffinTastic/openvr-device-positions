@@ -17,9 +17,6 @@ public static class Devices
     public static void SavePositions( SaveSettings saveSettings )
     {
         var fbxScene = new Scene();
-
-        fbxScene.
-
         var deviceRoot = fbxScene.RootNode.CreateChildNode( "VR Devices" );
 
         HashSet<ETrackedDeviceClass> desiredClasses = GetDesiredClasses( saveSettings );
