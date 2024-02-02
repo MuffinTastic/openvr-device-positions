@@ -105,11 +105,8 @@ public static class OVRManager
 
         Log.Text( $"Saving devices:" );
 
-        var origin = saveSettings.CenterOnHMD ?
-            ETrackingUniverseOrigin.TrackingUniverseSeated : ETrackingUniverseOrigin.TrackingUniverseStanding;
-
         var trackedDevicePoses = new TrackedDevicePose_t[OpenVR.k_unMaxTrackedDeviceCount];
-        OpenVR.System.GetDeviceToAbsoluteTrackingPose( origin, 0.0f, trackedDevicePoses );
+        OpenVR.System.GetDeviceToAbsoluteTrackingPose( ETrackingUniverseOrigin.TrackingUniverseStanding, 0.0f, trackedDevicePoses );
 
         for ( int id = 0; id < OpenVR.k_unMaxTrackedDeviceCount; id++ )
         {
