@@ -13,8 +13,6 @@ internal static class Program
         CancellationTokenSource mainCTS = new();
         CancellationTokenSource overlayCTS = new();
 
-        GCLoop( mainCTS.Token );
-
         Log.RegisterSink( verbose: true, ( text ) => Debug.Write( $"{text}\n" ) );
 
         Log.Text( "Starting OVRDP" );
@@ -32,21 +30,5 @@ internal static class Program
         OverlayThread.WaitForStop();
 
         mainCTS.Cancel();
-    }
-
-
-    /// <summary>
-    /// Run a garbage collection loop in the background.
-    /// VR is a tad memory intensive, so despite this being
-    /// C# we still want to keep usage down.
-    /// </summary>
-    async static void GCLoop( CancellationToken ct )
-    {
-        while ( !ct.IsCancellationRequested )
-        {
-            // 15 seconds
-            await Task.Delay( 15 * 1000 );
-            GC.Collect();
-        }
     }
 }
