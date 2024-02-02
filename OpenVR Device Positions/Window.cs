@@ -71,4 +71,9 @@ public partial class Window : Form
     {
         Application.Exit();
     }
+
+    private void openSaveFolderButton_Click( object sender, EventArgs e )
+    {
+        Util.OpenOutputDirectory();
+    }
 }

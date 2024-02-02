@@ -30,6 +30,7 @@ partial class Window
     {
         logBox = new ListBox();
         quitButton = new Button();
+        openSaveFolderButton = new Button();
         SuspendLayout();
         // 
         // logBox
@@ -44,19 +45,30 @@ partial class Window
         // 
         // quitButton
         // 
-        quitButton.Location = new Point( 12, 217 );
+        quitButton.Location = new Point( 195, 217 );
         quitButton.Name = "quitButton";
-        quitButton.Size = new Size( 360, 32 );
+        quitButton.Size = new Size( 177, 32 );
         quitButton.TabIndex = 2;
         quitButton.Text = "Quit";
         quitButton.UseVisualStyleBackColor = true;
         quitButton.Click +=  quitButton_Click ;
+        // 
+        // openSaveFolderButton
+        // 
+        openSaveFolderButton.Location = new Point( 12, 217 );
+        openSaveFolderButton.Name = "openSaveFolderButton";
+        openSaveFolderButton.Size = new Size( 177, 32 );
+        openSaveFolderButton.TabIndex = 3;
+        openSaveFolderButton.Text = "Open Output Folder";
+        openSaveFolderButton.UseVisualStyleBackColor = true;
+        openSaveFolderButton.Click +=  openSaveFolderButton_Click ;
         // 
         // Window
         // 
         AutoScaleDimensions = new SizeF( 7F, 15F );
         AutoScaleMode = AutoScaleMode.Font;
         ClientSize = new Size( 384, 261 );
+        Controls.Add( openSaveFolderButton );
         Controls.Add( quitButton );
         Controls.Add( logBox );
         FormBorderStyle = FormBorderStyle.FixedSingle;
@@ -70,4 +82,5 @@ partial class Window
 
     private ListBox logBox;
     private Button quitButton;
+    private Button openSaveFolderButton;
 }
