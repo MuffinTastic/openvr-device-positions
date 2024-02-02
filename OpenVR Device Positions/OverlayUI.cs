@@ -292,7 +292,7 @@ public static class OverlayUI
         _saveCountdownState = null;
 
         _iSaveDisabled = true;
-        OVRManager.SavePositions( saveSettings );
+        Devices.SavePositions( saveSettings );
         await Task.Delay( 750 );
         _iSaveDisabled = false;
     }
