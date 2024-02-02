@@ -1,7 +1,11 @@
-﻿using System;
+﻿using Aspose.ThreeD;
+using Aspose.ThreeD.Formats;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using Valve.VR;
+using Vortice.Mathematics;
 
 namespace OVRDP;
 
@@ -12,6 +16,12 @@ public static class Devices
     /// </summary>
     public static void SavePositions( SaveSettings saveSettings )
     {
+        var fbxScene = new Scene();
+
+        fbxScene.
+
+        var deviceRoot = fbxScene.RootNode.CreateChildNode( "VR Devices" );
+
         HashSet<ETrackedDeviceClass> desiredClasses = GetDesiredClasses( saveSettings );
 
         Log.Text( $"Saving devices:" );
@@ -21,8 +31,9 @@ public static class Devices
 
         var hmdPose = trackedDevicePoses[OpenVR.k_unTrackedDeviceIndex_Hmd];
         var hmdMatrix = hmdPose.mDeviceToAbsoluteTracking; // Let's assume it's being tracked...
-        var hmdPosition = hmdMatrix.GetPosition();
-        var hmdRotation = hmdMatrix.GetRotation();
+        var hmdPositionXZ = hmdMatrix.GetPosition() * new Vector3( 1.0f, 0.0f, 1.0f );
+        var hmdRotationYEuler = hmdMatrix.GetRotation().ToEuler() * new Vector3( 0.0f, 1.0f, 0.0f );
+        var hmdRotationYInverse = Quaternion.Inverse( hmdRotationYEuler.FromEuler() );
 
         for ( int id = 0; id < OpenVR.k_unMaxTrackedDeviceCount; id++ )
         {
@@ -41,17 +52,43 @@ public static class Devices
             var position = matrix.GetPosition();
             var rotation = matrix.GetRotation();
 
+            // Transform device position and rotation relative to
+            // HMD on the XZ plane
+            if ( saveSettings.CenterOnHMD )
+            {
+                position -= hmdPositionXZ;
+                position = Vector3.Transform(position, hmdRotationYInverse );
+                rotation = hmdRotationYInverse * rotation;
+            }
+
+            string? renderModel = null;
+
             Log.Text( $" -- {deviceClass} - {pose.eTrackingResult}" );
             if ( OVRManager.GetDeviceInfo( (uint) id, out OVRDeviceInfo info ) )
             {
                 Log.Text( $"      - {info.HardwareModel}" );
-                Log.Text( $"      - {info.RenderModel}" );
+                if ( saveSettings.UseDeviceModels )
+                {
+                    Log.Text( $"      - {info.RenderModel}" );
+                    renderModel = info.RenderModel;
+                }
             }
             Log.Text( $"      - Pos:{position}" );
             Log.Text( $"      - Rot:{rotation}" );
+
+            var deviceNode = deviceRoot.CreateChildNode( $"{deviceClass}.{id}" );
+            deviceNode.Entity = MeshStore.GetRenderModel( renderModel );
+            deviceNode.Transform.Translation = new AsposeVector3( position.X, position.Y, position.Z );
+            deviceNode.Transform.Rotation = new AsposeQuaternion( rotation.W, rotation.X, rotation.Y, rotation.Z );
+
+            Log.Text( $"Added node {deviceNode.Name}" );
         }
 
-        //var test = new FBXScene( "test", 2.0f );
+        string timestamp = DateTime.Now.ToString( "yyyy-MM-dd_hh.mm.ss" );
+        string filename = Path.Join( Util.OutputDirectory, $"VRDevices_{timestamp}.fbx" );
+        Log.Text( $"Saving to {filename}" );
+        
+        fbxScene.Save( filename, FileFormat.FBX7400Binary );
 
         Log.Text( "Done" );
     }

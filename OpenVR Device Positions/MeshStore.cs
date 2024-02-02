@@ -1,8 +1,8 @@
 ﻿using Aspose.ThreeD;
 using Aspose.ThreeD.Entities;
+using Aspose.ThreeD.Utilities;
 using System.Numerics;
 using Valve.VR;
-using AsposeVector4 = Aspose.ThreeD.Utilities.Vector4;
 
 namespace OVRDP;
 
@@ -19,7 +19,7 @@ public static class MeshStore
         Log.Text( $"Loading default device render model" );
         var path = Path.Join( Util.AssetDirectory, DefaultDeviceMeshFile );
         var scene = Scene.FromFile( path );
-        _defaultDeviceMesh = (Mesh) scene.RootNode.Entity;
+        _defaultDeviceMesh = (Mesh) scene.RootNode.ChildNodes[0].Entity;
         return _defaultDeviceMesh;
     }
 
@@ -76,12 +76,13 @@ public static class MeshStore
 
         PolygonBuilder builder = new PolygonBuilder( mesh );
 
+        int indexCount = 0;
         for ( int i = 0; i < renderModel.TriangleCount; i++ )
         {
             builder.Begin();
-            builder.AddVertex( renderModel.Indices[i] );
-            builder.AddVertex( renderModel.Indices[i + 1] );
-            builder.AddVertex( renderModel.Indices[i + 2] );
+            builder.AddVertex( renderModel.Indices[indexCount++] );
+            builder.AddVertex( renderModel.Indices[indexCount++] );
+            builder.AddVertex( renderModel.Indices[indexCount++] );
             builder.End();
         }
 
