@@ -97,7 +97,7 @@ public static class OVRManager
     /// <summary>
     /// Create an OpenVR overlay instance
     /// </summary>
-    public static OVROverlayWrapper? CreateOverlay( ResourceFactory resourceFactory, int width, int height, string key, string name )
+    public static OVROverlayWrapper? CreateOverlay( string key, string name )
     {
         ulong handle = 0;
         
@@ -107,7 +107,7 @@ public static class OVRManager
             return null;
         }
 
-        return new OVROverlayWrapper( handle, resourceFactory, width, height );
+        return new OVROverlayWrapper( handle );
     }
 
     public static bool GetDeviceInfo( uint deviceID, out OVRDeviceInfo info )

@@ -146,8 +146,6 @@ public static class OverlayThread
 
 
         _ovrOverlay = OVRManager.CreateOverlay(
-            factory,
-            OverlayConstants.RenderWidth, OverlayConstants.RenderHeight,
             OverlayConstants.OverlayKeyName, OverlayConstants.ProgramNameInternal
         );
         if ( _ovrOverlay is null )
@@ -194,10 +192,10 @@ public static class OverlayThread
             
             _uiRenderer.Render( _device, _commandList );
 
-            _ovrOverlay!.SubmitFrame( _device, _commandList, _renderTarget );
-
             _commandList.End();
             _device.SubmitCommands( _commandList );
+            _device.WaitForIdle();
+            _ovrOverlay!.SubmitFrame( _device, _renderTarget );
 
             var wait = _targetFrameTime - stopwatch.Elapsed;
             int waitMS = wait.Milliseconds;
