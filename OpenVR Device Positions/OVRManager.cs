@@ -133,12 +133,18 @@ public static class OVRManager
             {
                 Log.Text( $"      - {info.HardwareModel}" );
                 Log.Text( $"      - {info.RenderModel}" );
+
+                var test = GetRenderModel( info.RenderModel );
+                if ( test is OVRRenderModel model )
+                {
+                    Log.Text( $"      - Render model vertex count: {model.TriangleCount}" );
+                }
             }
             Log.Text( $"      - Pos:{position}" );
             Log.Text( $"      - Rot:{rotation}" );
         }
 
-
+        //var test = new FBXScene( "test", 2.0f );
 
         Log.Text( "Done" );
     }
@@ -215,5 +221,27 @@ public static class OVRManager
 
 
         return true;
+    }
+
+    public static OVRRenderModel? GetRenderModel( string modelName )
+    {
+        IntPtr handle = IntPtr.Zero;
+        EVRRenderModelError error = default;
+
+        while (
+            ( error = OpenVR.RenderModels.LoadRenderModel_Async( modelName, ref handle ) )
+                == EVRRenderModelError.Loading )
+        {
+            Thread.Sleep( 5 );
+        }
+
+        if ( error != EVRRenderModelError.None )
+            return null;
+
+        var model = new OVRRenderModel( handle );
+
+        OpenVR.RenderModels.FreeRenderModel( handle );
+
+        return model;
     }
 }
