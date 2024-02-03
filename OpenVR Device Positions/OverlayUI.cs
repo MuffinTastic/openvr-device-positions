@@ -31,8 +31,6 @@ public static class OverlayUI
 
     private static OVROverlayWrapper? _ovrOverlay = null;
 
-    private static Stopwatch _openedTime = new Stopwatch();
-
     public static bool Open( OVROverlayWrapper ovrOverlay )
     {
         _ovrOverlay = ovrOverlay;
@@ -41,29 +39,12 @@ public static class OverlayUI
 
         _ovrOverlay.Show();
 
-        _openedTime.Start();
-
         return true;
     }
 
     public static void Close()
     {
         _ovrOverlay?.Hide();
-    }
-
-    private static float blag = 0.0f;
-
-    /// <summary>
-    /// Updates the position and rotation of the overlay
-    /// </summary>
-    public static void UpdateTransform()
-    {
-        blag = (float) _openedTime.Elapsed.TotalSeconds;
-
-        _position = new Vector3( 0.0f, 1.5f, -1.5f );
-        _rotation = Quaternion.Identity; // Quaternion.CreateFromAxisAngle( Vector3.UnitY, MathHelper.ToRadians( 180.0f ) );
-
-        _ovrOverlay!.SetTransform( _position, _rotation );
     }
 
 

@@ -100,14 +100,15 @@ public static class OVRManager
     public static OVROverlayWrapper? CreateOverlay( string key, string name )
     {
         ulong handle = 0;
+        ulong thumbnailHandle = 0;
         
-        EVROverlayError error = OpenVR.Overlay.CreateOverlay( key, name, ref handle );
+        EVROverlayError error = OpenVR.Overlay.CreateDashboardOverlay( key, name, ref handle, ref thumbnailHandle );
         if ( error != EVROverlayError.None )
         {
             return null;
         }
 
-        return new OVROverlayWrapper( handle );
+        return new OVROverlayWrapper( handle, thumbnailHandle );
     }
 
     public static bool GetDeviceInfo( uint deviceID, out OVRDeviceInfo info )

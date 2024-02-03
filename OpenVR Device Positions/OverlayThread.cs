@@ -189,8 +189,6 @@ public static class OverlayThread
             var snapshot = _ovrOverlay!.PollEvents();
             _uiRenderer.Update( delta, snapshot );
 
-            OverlayUI.UpdateTransform();
-
             OverlayUI.UpdateUI();
 
             _commandList.Begin();

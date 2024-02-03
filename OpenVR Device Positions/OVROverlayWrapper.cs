@@ -14,11 +14,13 @@ namespace OVRDP;
 public class OVROverlayWrapper
 {
     private ulong _handle;
+    private ulong _thumbnailHandle;
     private Vector2 _mouseRemap = new Vector2( 1.0f );
 
-    public OVROverlayWrapper( ulong handle )
+    public OVROverlayWrapper( ulong handle, ulong thumbnailHandle )
     {
         _handle = handle;
+        _thumbnailHandle = thumbnailHandle;
 
         // Sane defaults
 
@@ -53,12 +55,6 @@ public class OVROverlayWrapper
     public void SetWidthInMeters( float width )
     {
         OpenVR.Overlay.SetOverlayWidthInMeters( _handle, width );
-    }
-
-    public void SetTransform( Vector3 position, Quaternion rotation )
-    {
-        var mat = HmdMatrix34_tExtensions.FromVectorAndQuat( position, rotation );
-        OpenVR.Overlay.SetOverlayTransformAbsolute( _handle, ETrackingUniverseOrigin.TrackingUniverseStanding, ref mat );
     }
 
     public void SetColor( Vector3 color )
