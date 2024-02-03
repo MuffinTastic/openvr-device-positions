@@ -11,8 +11,6 @@ using System.Threading.Channels;
 using System.Threading.Tasks;
 using Valve.VR;
 using Veldrid;
-using Veldrid.Sdl2;
-using Veldrid.StartupUtilities;
 
 namespace OVRDP;
 
@@ -148,7 +146,7 @@ public static class OverlayThread
 
 
         _ovrOverlay = OVRManager.CreateOverlay(
-            OverlayConstants.OverlayKeyName, OverlayConstants.ProgramNameInternal
+            OverlayConstants.OverlayKeyName, OverlayConstants.ProgramNameReadable
         );
         if ( _ovrOverlay is null )
         {
