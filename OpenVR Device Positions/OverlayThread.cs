@@ -55,7 +55,6 @@ public static class OverlayThread
     private static GraphicsDevice _device;
     private static Texture _renderTarget;
     private static Framebuffer _frameBuffer;
-    private static Pipeline _pipeLine;
     private static CommandList _commandList;
 
     private static ImGuiRenderer _uiRenderer;

@@ -15,9 +15,6 @@ public static class OverlayUI
     private const int HelpOffset = 4;
 
 
-    private static Vector3 _position;
-    private static Quaternion _rotation;
-
     private static OVROverlayWrapper? _ovrOverlay = null;
 
     public static bool Open( OVROverlayWrapper ovrOverlay )
