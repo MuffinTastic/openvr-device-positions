@@ -1,8 +1,5 @@
-﻿using System.Diagnostics;
-using System.Text;
+﻿using System.Text;
 using Valve.VR;
-using Veldrid;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace OVRDP;
 

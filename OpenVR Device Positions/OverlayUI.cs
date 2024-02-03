@@ -1,16 +1,5 @@
 ﻿using ImGuiNET;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Linq.Expressions;
 using System.Numerics;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using Valve.VR;
-using Vortice.Mathematics;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace OVRDP;
 

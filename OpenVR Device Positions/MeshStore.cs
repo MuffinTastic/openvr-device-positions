@@ -1,7 +1,5 @@
 ﻿using Aspose.ThreeD;
 using Aspose.ThreeD.Entities;
-using Aspose.ThreeD.Utilities;
-using System.Numerics;
 using Valve.VR;
 
 namespace OVRDP;

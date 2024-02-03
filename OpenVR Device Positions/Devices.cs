@@ -1,8 +1,4 @@
 ﻿using Aspose.ThreeD;
-using Aspose.ThreeD.Formats;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
 using Valve.VR;
 using Vortice.Mathematics;
