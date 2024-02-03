@@ -45,8 +45,10 @@ public static class OverlayThread
 
     #region Overlay thread
 
+    // Min 10fps, Max 100ms frametime
     private const float _minFrameTarget = 10.0f;
-    private const int _maxWaitTimeMS = (int) (1.0f / _minFrameTarget);
+    private const float _minTargetFrameTimeFloat = 1.0f / _minFrameTarget;
+    private static TimeSpan _maxWaitTimeSpan = TimeSpan.FromSeconds( _minTargetFrameTimeFloat );
 
     private static float _frameCap = 90.0f;
     private static float _targetFrameTimeFloat = 1.0f / _frameCap;
@@ -190,15 +192,15 @@ public static class OverlayThread
             _device.WaitForIdle();
             _ovrOverlay!.SubmitFrame( _device, _renderTarget );
 
-            var wait = _targetFrameTime - stopwatch.Elapsed;
-            int waitMS = wait.Milliseconds;
+            var elapsed = stopwatch.Elapsed;
+            var wait = _targetFrameTime - elapsed;
 
-            if ( waitMS > 0 )
+            if ( wait.Milliseconds > 0 )
             {
-                if ( waitMS > _maxWaitTimeMS )
-                    waitMS = _maxWaitTimeMS;
+                if ( wait > _maxWaitTimeSpan )
+                    wait = _maxWaitTimeSpan;
 
-                Thread.Sleep( waitMS );
+                Thread.Sleep( wait );
             }
 
             delta = (float) stopwatch.Elapsed.TotalSeconds;
