@@ -1,6 +1,6 @@
 # OpenVR Device Positions
 
-A tool to save the positions and rotations of tracked devices in SteamVR to an FBX file
+A tool to save the positions and rotations of tracked devices in SteamVR to an FBX file. Could be useful e.g. for adjusting avatar proportions for full-body tracking in platforms like VRChat.
 
 Features:
 
