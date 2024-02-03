@@ -91,7 +91,7 @@ public static class OverlayUI
             ImGui.BeginDisabled();
 
         ImGui.Checkbox( "Use Device Models", ref _iUseDeviceModels );
-        ImGui.SameLine(); HelpMarker( "Save to the FBX with actual VR device models instead of basic spheres" );
+        ImGui.SameLine(); HelpMarker( "Save to the FBX with actual VR device models instead of placeholders" );
         ImGui.Checkbox( "Center on HMD", ref _iCenterOnHMD );
         ImGui.SameLine(); HelpMarker( "Put the HMD at the origin of the FBX and reposition everything else relative to it" );
         ImGui.Checkbox( "Save Invalid Poses", ref _iSaveInvalidPoses );
