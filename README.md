@@ -19,3 +19,7 @@ Desktop window
 VR overlay
 
 ![VR screenshot](Media/vrmonitor_uuhDdyzKkJ.jpg)
+
+Output FBX
+
+![Output FBX](Media/blender_ZmiX11aH8q.png)
