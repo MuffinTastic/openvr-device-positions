@@ -47,8 +47,8 @@ public static class OverlayThread
 
     // Min 10fps, Max 100ms frametime
     private const float _minFrameTarget = 10.0f;
-    private const float _minTargetFrameTimeFloat = 1.0f / _minFrameTarget;
-    private static TimeSpan _maxWaitTimeSpan = TimeSpan.FromSeconds( _minTargetFrameTimeFloat );
+    private const float _maxTargetFrameTimeFloat = 1.0f / _minFrameTarget;
+    private static TimeSpan _maxWaitTimeSpan = TimeSpan.FromSeconds( _maxTargetFrameTimeFloat );
 
     private static float _frameCap = 90.0f;
     private static float _targetFrameTimeFloat = 1.0f / _frameCap;
